@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "ms-usuarios-collection",
+		"name": "MS Usuarios - Oracle Cloud",
+		"description": "Colección completa para probar el microservicio de usuarios con Oracle Cloud",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "1. Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users"]
+						},
+						"description": "Obtiene todos los usuarios del sistema"
+					}
+				},
+				{
+					"name": "2. Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "1"]
+						},
+						"description": "Obtiene un usuario específico por su ID"
+					}
+				},
+				{
+					"name": "3. Get User by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/email/admin@example.com",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "email", "admin@example.com"]
+						},
+						"description": "Obtiene un usuario por su email"
+					}
+				},
+				{
+					"name": "4. Create New User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Carlos Mendoza\",\n  \"email\": \"carlos@example.com\",\n  \"passwordHash\": \"password123\",\n  \"enabled\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users"]
+						},
+						"description": "Crea un nuevo usuario"
+					}
+				},
+				{
+					"name": "5. Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Carlos Mendoza Actualizado\",\n  \"email\": \"carlos.nuevo@example.com\",\n  \"passwordHash\": \"newpassword456\",\n  \"enabled\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/4",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "4"]
+						},
+						"description": "Actualiza los datos de un usuario existente"
+					}
+				},
+				{
+					"name": "6. Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/4",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "4"]
+						},
+						"description": "Elimina un usuario por su ID"
+					}
+				},
+				{
+					"name": "7. Toggle User Enabled/Disabled",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/2/toggle-enabled",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "2", "toggle-enabled"]
+						},
+						"description": "Habilita o deshabilita un usuario (cambia el estado actual)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Roles",
+			"item": [
+				{
+					"name": "8. Assign Role to User (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/2/roles/ADMIN",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "2", "roles", "ADMIN"]
+						},
+						"description": "Asigna el rol ADMIN al usuario ID 2"
+					}
+				},
+				{
+					"name": "9. Assign Role to User (LAB_TECH)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/2/roles/LAB_TECH",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "2", "roles", "LAB_TECH"]
+						},
+						"description": "Asigna el rol LAB_TECH al usuario ID 2"
+					}
+				},
+				{
+					"name": "10. Assign Role to User (DOCTOR)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/3/roles/DOCTOR",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "3", "roles", "DOCTOR"]
+						},
+						"description": "Asigna el rol DOCTOR al usuario ID 3"
+					}
+				},
+				{
+					"name": "11. Remove Role from User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/users/2/roles/LAB_TECH",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "2", "roles", "LAB_TECH"]
+						},
+						"description": "Remueve un rol específico de un usuario"
+					}
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "12. Login - Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "login"]
+						},
+						"description": "Login con usuario administrador (datos de seed)"
+					}
+				},
+				{
+					"name": "13. Login - Lab Technician",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lab@example.com\",\n  \"password\": \"lab123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "login"]
+						},
+						"description": "Login con usuario técnico de laboratorio (datos de seed)"
+					}
+				},
+				{
+					"name": "14. Login - Doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"doctor@example.com\",\n  \"password\": \"doc123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "login"]
+						},
+						"description": "Login con usuario doctor (datos de seed)"
+					}
+				},
+				{
+					"name": "15. Login - Invalid Credentials",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"invalid@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "users", "login"]
+						},
+						"description": "Prueba de login con credenciales inválidas (debe retornar 401)"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081",
+			"type": "string"
+		}
+	]
+}
