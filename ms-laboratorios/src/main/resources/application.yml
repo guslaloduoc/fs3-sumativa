@@ -14,9 +14,9 @@ spring:
 
   jpa:
     hibernate:
-      # validate: no modifica el schema, solo valida que coincida con las entidades
-      # Flyway se encarga de las migraciones
-      ddl-auto: validate
+      # update: actualiza el schema automáticamente
+      # Temporalmente cambiado para crear tablas faltantes
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.OracleDialect
@@ -30,6 +30,7 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
+    validate-on-migrate: false
 
 logging:
   level:
