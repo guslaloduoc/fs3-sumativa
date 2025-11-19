@@ -1,11 +1,12 @@
 package com.sumativa.ms_usuarios.controller;
 
-import com.sumativa.ms_usuarios.dto.LoginRequest;
-import com.sumativa.ms_usuarios.dto.LoginResponse;
+import com.sumativa.ms_usuarios.dto.*;
 import com.sumativa.ms_usuarios.entity.User;
+import com.sumativa.ms_usuarios.mapper.UserMapper;
 import com.sumativa.ms_usuarios.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Controlador REST para gestión de usuarios
  * Base URL: /api/users
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -28,20 +31,28 @@ public class UserController {
     /**
      * GET /api/users
      * Obtiene todos los usuarios
+     * @return Lista de UserResponseDto (sin passwordHash)
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        log.debug("GET /api/users - Fetching all users");
         List<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        List<UserResponseDto> responseDtos = users.stream()
+            .map(UserMapper::toResponseDto)
+            .collect(Collectors.toList());
+        log.debug("Returning {} users", responseDtos.size());
+        return ResponseEntity.ok(responseDtos);
     }
 
     /**
      * GET /api/users/{id}
      * Obtiene un usuario por ID
+     * @return UserResponseDto (sin passwordHash)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         return userService.findById(id)
+            .map(UserMapper::toResponseDto)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -49,10 +60,12 @@ public class UserController {
     /**
      * GET /api/users/email/{email}
      * Obtiene un usuario por email
+     * @return UserResponseDto (sin passwordHash)
      */
     @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable String email) {
         return userService.findByEmail(email)
+            .map(UserMapper::toResponseDto)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -65,32 +78,41 @@ public class UserController {
      * {
      *   "fullName": "Juan Pérez",
      *   "email": "juan@example.com",
-     *   "passwordHash": "password123",
+     *   "password": "password123",
      *   "enabled": true
      * }
+     * @return UserResponseDto del usuario creado (sin passwordHash)
      */
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
-        try {
-            User createdUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto createDto) {
+        User user = UserMapper.toEntity(createDto);
+        User createdUser = userService.createUser(user);
+        UserResponseDto responseDto = UserMapper.toResponseDto(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     /**
      * PUT /api/users/{id}
      * Actualiza un usuario existente
+     *
+     * Body ejemplo (todos los campos opcionales):
+     * {
+     *   "fullName": "Juan Pérez Updated",
+     *   "email": "newemail@example.com",
+     *   "password": "newpassword123",
+     *   "enabled": false
+     * }
+     * @return UserResponseDto del usuario actualizado (sin passwordHash)
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
-        try {
-            User updatedUser = userService.updateUser(id, userDetails);
-            return ResponseEntity.ok(updatedUser);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto updateDto) {
+        User user = userService.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + id));
+
+        UserMapper.updateEntityFromDto(user, updateDto);
+        User updatedUser = userService.updateUser(id, user);
+        UserResponseDto responseDto = UserMapper.toResponseDto(updatedUser);
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -98,27 +120,21 @@ public class UserController {
      * Elimina un usuario
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok(Map.of("message", "Usuario eliminado exitosamente"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(Map.of("message", "Usuario eliminado exitosamente"));
     }
 
     /**
      * PATCH /api/users/{id}/toggle-enabled
      * Habilita/deshabilita un usuario
+     * @return UserResponseDto del usuario actualizado (sin passwordHash)
      */
     @PatchMapping("/{id}/toggle-enabled")
-    public ResponseEntity<?> toggleUserEnabled(@PathVariable Long id) {
-        try {
-            User user = userService.toggleUserEnabled(id);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<UserResponseDto> toggleUserEnabled(@PathVariable Long id) {
+        User user = userService.toggleUserEnabled(id);
+        UserResponseDto responseDto = UserMapper.toResponseDto(user);
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -126,15 +142,13 @@ public class UserController {
      * Asigna un rol a un usuario
      *
      * Ejemplo: POST /api/users/1/roles/ADMIN
+     * @return UserResponseDto con roles actualizados (sin passwordHash)
      */
     @PostMapping("/{id}/roles/{roleName}")
-    public ResponseEntity<?> assignRole(@PathVariable Long id, @PathVariable String roleName) {
-        try {
-            User user = userService.assignRole(id, roleName);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<UserResponseDto> assignRole(@PathVariable Long id, @PathVariable String roleName) {
+        User user = userService.assignRole(id, roleName);
+        UserResponseDto responseDto = UserMapper.toResponseDto(user);
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -142,15 +156,13 @@ public class UserController {
      * Remueve un rol de un usuario
      *
      * Ejemplo: DELETE /api/users/1/roles/ADMIN
+     * @return UserResponseDto con roles actualizados (sin passwordHash)
      */
     @DeleteMapping("/{id}/roles/{roleName}")
-    public ResponseEntity<?> removeRole(@PathVariable Long id, @PathVariable String roleName) {
-        try {
-            User user = userService.removeRole(id, roleName);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<UserResponseDto> removeRole(@PathVariable Long id, @PathVariable String roleName) {
+        User user = userService.removeRole(id, roleName);
+        UserResponseDto responseDto = UserMapper.toResponseDto(user);
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -164,23 +176,11 @@ public class UserController {
      * }
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        Optional<User> userOpt = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword())
+            .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas o usuario deshabilitado"));
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            LoginResponse response = new LoginResponse(
-                user.getId(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getEnabled(),
-                user.getCreatedAt(),
-                user.getRoles()
-            );
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "Credenciales inválidas o usuario deshabilitado"));
-        }
+        LoginResponse response = UserMapper.toLoginResponse(user);
+        return ResponseEntity.ok(response);
     }
 }

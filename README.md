@@ -10,6 +10,14 @@
 
 Sistema backend para la gestión de laboratorios clínicos, control de usuarios y asignación de análisis. Implementado con arquitectura de microservicios usando Spring Boot y Oracle Cloud Database.
 
+**Características principales:**
+- ✅ Arquitectura de microservicios con DTOs
+- ✅ Manejo centralizado de errores con @RestControllerAdvice
+- ✅ Logging estructurado con SLF4J
+- ✅ Validaciones de negocio robustas
+- ✅ Seguridad mediante externalización de credenciales
+- ✅ Tests unitarios con JUnit 5 y Mockito
+
 ---
 
 ## Arquitectura
@@ -20,9 +28,23 @@ El proyecto consta de 2 microservicios independientes:
 
 Control de usuarios, roles e inicio de sesión.
 
+**Funcionalidades:**
+- Gestión completa de usuarios (CRUD)
+- Sistema de roles y permisos
+- Login simple (texto plano según requerimientos académicos)
+- Validación de dominios de email autorizados (duocuc.cl, example.com)
+- Protección de usuarios ADMIN (no eliminables/no deshabilitables)
+
 ### 2. **ms-laboratorios** (Puerto 8082)
 
 Gestión de laboratorios y asignación de pacientes para análisis clínicos.
+
+**Funcionalidades:**
+- Gestión de laboratorios clínicos (CRUD)
+- Asignación de pacientes a laboratorios
+- Validación de nombres únicos
+- Validación de formato de teléfono (7-15 dígitos)
+- Protección contra eliminación de laboratorios con asignaciones activas
 
 ---
 
@@ -34,7 +56,10 @@ Gestión de laboratorios y asignación de pacientes para análisis clínicos.
 - **ORM:** Hibernate + JPA
 - **Migraciones:** Flyway
 - **Build:** Maven
-- **Validación:** Bean Validation
+- **Validación:** Bean Validation (javax.validation)
+- **Logging:** SLF4J + Logback
+- **Testing:** JUnit 5 + Mockito
+- **Mapeo:** DTOs con mappers personalizados
 
 ---
 
@@ -46,20 +71,33 @@ Gestión de laboratorios y asignación de pacientes para análisis clínicos.
 - Maven 3.x
 - Acceso a Oracle Cloud ATP (wallet configurado)
 
-### Ejecutar ms-users:
+### 1. Configurar variables de entorno
+
+Crear archivo `.env` en la raíz del proyecto (basado en `.env.example`):
+
+```properties
+DB_TNS_NAME=fs3_tp
+TNS_ADMIN_PATH=./wallet
+DB_USERNAME=ADMIN
+DB_PASSWORD=tu_password_aqui
+```
+
+📖 **Ver guía completa:** [SECURITY_SETUP.md](SECURITY_SETUP.md)
+
+### 2. Ejecutar ms-users:
 
 ```bash
 cd ms-users
-./mvnw.cmd spring-boot:run
+./mvnw.cmd clean spring-boot:run
 ```
 
 **Puerto:** http://localhost:8081
 
-### Ejecutar ms-laboratorios:
+### 3. Ejecutar ms-laboratorios:
 
 ```bash
 cd ms-laboratorios
-./mvnw.cmd spring-boot:run
+./mvnw.cmd clean spring-boot:run
 ```
 
 **Puerto:** http://localhost:8082
@@ -75,13 +113,18 @@ sumativa/
 │   │   └── com/sumativa/ms_usuarios/
 │   │       ├── controller/            # Endpoints REST
 │   │       ├── service/               # Lógica de negocio
-│   │       ├── repository/            # Acceso a datos
-│   │       ├── entity/                # Entidades JPA
-│   │       ├── dto/                   # Data Transfer Objects
-│   │       └── config/                # Configuración
+│   │       ├── repository/            # Acceso a datos (JpaRepository)
+│   │       ├── entity/                # Entidades JPA (User, Role)
+│   │       ├── dto/                   # DTOs (Request/Response)
+│   │       ├── mapper/                # Conversión Entity <-> DTO
+│   │       ├── exception/             # GlobalExceptionHandler
+│   │       └── config/                # Configuración + DataInitializer
 │   ├── src/main/resources/
 │   │   ├── application.yml            # Configuración de Spring
 │   │   └── db/migration/              # Scripts Flyway
+│   ├── src/test/java/                 # Tests unitarios
+│   │   ├── mapper/                    # Tests de mappers
+│   │   └── service/                   # Tests de validaciones
 │   └── pom.xml
 │
 ├── ms-laboratorios/                   # Microservicio de laboratorios
@@ -90,15 +133,24 @@ sumativa/
 │   │       ├── controller/            # Endpoints REST
 │   │       ├── service/               # Lógica de negocio
 │   │       ├── repository/            # Acceso a datos
-│   │       ├── entity/                # Entidades JPA
-│   │       ├── dto/                   # Data Transfer Objects
-│   │       └── config/                # Configuración
+│   │       ├── entity/                # Entidades JPA (Laboratorio, Asignacion)
+│   │       ├── dto/                   # DTOs (Request/Response)
+│   │       ├── mapper/                # Conversión Entity <-> DTO
+│   │       ├── exception/             # GlobalExceptionHandler
+│   │       └── config/                # Configuración + DataInitializer
 │   ├── src/main/resources/
 │   │   ├── application.yml            # Configuración de Spring
 │   │   └── db/migration/              # Scripts Flyway
+│   ├── src/test/java/                 # Tests unitarios
+│   │   ├── mapper/                    # Tests de mappers
+│   │   └── service/                   # Tests de validaciones
 │   └── pom.xml
 │
-├── Wallet_fs3/                        # Oracle Cloud Wallet
+├── Wallet_fs3/                        # Oracle Cloud Wallet (no versionado)
+├── .env.example                       # Template de variables de entorno
+├── .gitignore                         # Excluye wallet y credenciales
+├── API_DOCUMENTATION.md               # Documentación completa de API
+├── SECURITY_SETUP.md                  # Guía de configuración segura
 ├── DuocUC_Fullstack3_Microservices.postman_collection.json
 └── README.md (este archivo)
 ```
@@ -107,21 +159,27 @@ sumativa/
 
 ## Credenciales de Prueba
 
-### ms-users
+### ms-users (Usuarios de prueba precargados)
 
 ```
-Admin:    admin@hospital.cl / admin123
-Doctor:   juan.perez@hospital.cl / doctor123
-Lab Tech: maria.gonzalez@hospital.cl / lab123
+Admin:    admin@example.com / admin123
+Doctor:   juan.perez@duocuc.cl / doctor123
+Lab Tech: maria.gonzalez@duocuc.cl / lab123
 ```
 
 ### Base de Datos Oracle
 
+⚠️ **IMPORTANTE:** Las credenciales deben configurarse mediante variables de entorno:
+
+```bash
+# Configurar en .env (no versionado)
+DB_TNS_NAME=fs3_tp
+TNS_ADMIN_PATH=./wallet
+DB_USERNAME=ADMIN
+DB_PASSWORD=tu_password_aqui
 ```
-URL: jdbc:oracle:thin:@fs3_tp?TNS_ADMIN=./wallet
-Usuario: ADMIN
-Password: Duocuc@.,2025
-```
+
+Ver [SECURITY_SETUP.md](SECURITY_SETUP.md) para más detalles.
 
 ---
 
@@ -150,6 +208,8 @@ Password: Duocuc@.,2025
 | DELETE | `/laboratorios/{id}` | Eliminar laboratorio   |
 | GET    | `/asignaciones`      | Listar asignaciones    |
 | POST   | `/asignaciones`      | Crear asignación       |
+
+📖 **Documentación completa de API con DTOs, ejemplos y manejo de errores:** [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
 ---
 
@@ -193,13 +253,17 @@ server:
 
 ### Configurar base de datos:
 
+⚠️ **IMPORTANTE:** No codifiques credenciales en `application.yml`. Usa variables de entorno:
+
 ```yaml
 spring:
   datasource:
-    url: jdbc:oracle:thin:@fs3_tp?TNS_ADMIN=./wallet
-    username: ADMIN
-    password: Duocuc@.,2025
+    url: jdbc:oracle:thin:@${DB_TNS_NAME:fs3_tp}?TNS_ADMIN=${TNS_ADMIN_PATH:./wallet}
+    username: ${DB_USERNAME:ADMIN}
+    password: ${DB_PASSWORD}
 ```
+
+Las credenciales reales deben configurarse en `.env` (ver sección Instalación).
 
 ---
 
@@ -218,6 +282,104 @@ spring:
 - No se implementa sistema de pagos (fuera del alcance)
 - Solo BackEnd, sin interfaz gráfica
 - Ambos microservicios deben estar ejecutándose para pruebas completas
+
+---
+
+## Arquitectura Técnica
+
+### DTOs (Data Transfer Objects)
+
+Cada microservicio implementa una capa completa de DTOs para separar la representación de datos de la lógica de dominio:
+
+**ms-users:**
+- `UserResponseDto` - Respuestas de usuario (sin `passwordHash` por seguridad)
+- `UserCreateDto` - Creación de usuarios con validaciones Bean Validation
+- `UserUpdateDto` - Actualizaciones parciales (campos opcionales)
+- `RoleResponseDto` - Información de roles
+- `LoginRequest` / `LoginResponse` - Autenticación
+
+**ms-laboratorios:**
+- `LaboratorioResponseDto`, `LaboratorioCreateDto`, `LaboratorioUpdateDto`
+- `AsignacionResponseDto`, `AsignacionCreateDto`, `AsignacionUpdateDto`
+
+**Mappers:**
+Clases utilitarias estáticas (`UserMapper`, `LaboratorioMapper`, `AsignacionMapper`) para conversión entre entidades y DTOs.
+
+### Manejo Centralizado de Errores
+
+Implementado mediante `@RestControllerAdvice` con `GlobalExceptionHandler`:
+
+**Estructura consistente de errores:**
+```json
+{
+  "timestamp": "2025-11-19T15:45:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Descripción del error",
+  "path": "/api/users",
+  "fieldErrors": {
+    "campo": "mensaje de validación"
+  }
+}
+```
+
+**Excepciones manejadas:**
+- `MethodArgumentNotValidException` → 400 (errores de validación Bean Validation)
+- `IllegalArgumentException` → 400 (errores de negocio)
+- `NoSuchElementException` → 404 (recurso no encontrado)
+- `Exception` → 500 (errores inesperados)
+
+### Validaciones de Negocio
+
+**ms-users:**
+1. **Validación de dominio de email:** Solo se permiten emails con dominios `duocuc.cl` o `example.com`
+2. **Protección de ADMIN:** No se pueden eliminar usuarios con rol ADMIN
+3. **Usuario ADMIN principal:** El usuario `admin@example.com` no puede ser deshabilitado
+
+**ms-laboratorios:**
+1. **Nombres únicos:** No se permiten laboratorios con nombres duplicados (case-insensitive)
+2. **Validación de teléfono:** Formato validado (7-15 dígitos, acepta espacios, guiones, paréntesis)
+3. **Protección de datos:** No se pueden eliminar laboratorios con asignaciones activas
+
+### Logging Estructurado
+
+Implementado con **SLF4J + Logback** (`@Slf4j`):
+
+- **INFO:** Operaciones exitosas (creación, actualización, eliminación, login)
+- **WARN:** Validaciones fallidas, recursos no encontrados
+- **ERROR:** Errores inesperados del servidor
+
+**Seguridad:** Las contraseñas NUNCA se registran en logs.
+
+### Testing
+
+Tests unitarios con **JUnit 5 + Mockito**:
+
+**ms-users:**
+- `UserMapperTest` - Tests de conversión Entity ↔ DTO
+- `UserServiceValidationTest` - Tests de reglas de negocio
+
+**ms-laboratorios:**
+- `LaboratorioMapperTest` - Tests de mappers
+- `LaboratorioServiceValidationTest` - Tests de validaciones
+
+**Ejecutar tests:**
+```bash
+# Desde el directorio de cada microservicio
+./mvnw.cmd test
+
+# Con reporte de cobertura (JaCoCo)
+./mvnw.cmd clean test jacoco:report
+# Ver reporte: target/site/jacoco/index.html
+```
+
+---
+
+## Documentación Adicional
+
+- 📄 [API_DOCUMENTATION.md](API_DOCUMENTATION.md) - Documentación completa de API con ejemplos de request/response
+- 🔒 [SECURITY_SETUP.md](SECURITY_SETUP.md) - Guía de configuración segura de wallet y credenciales
+- 📋 [.env.example](.env.example) - Template de variables de entorno
 
 ---
 
