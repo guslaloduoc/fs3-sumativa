@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Bootstrap 5 imports
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+// Custom global styles
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem 0;
+}
