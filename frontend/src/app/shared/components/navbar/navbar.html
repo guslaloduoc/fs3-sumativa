@@ -69,7 +69,7 @@
                   <br>
                   <small class="text-muted">{{ currentUser?.email }}</small>
                   <br>
-                  @if (currentUser?.roles && currentUser.roles.length > 0) {
+                  @if (currentUser && currentUser.roles && currentUser.roles.length > 0) {
                     <span class="badge bg-info mt-1">
                       {{ currentUser.roles[0].name }}
                     </span>

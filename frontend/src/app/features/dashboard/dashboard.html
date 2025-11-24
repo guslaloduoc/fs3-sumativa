@@ -14,7 +14,7 @@
                 <p class="mb-0 opacity-90">
                   Sistema de Gestión de Laboratorios - {{ currentUser?.email }}
                 </p>
-                @if (currentUser?.roles && currentUser.roles.length > 0) {
+                @if (currentUser && currentUser.roles && currentUser.roles.length > 0) {
                   <span class="badge bg-light text-primary mt-2">
                     <i class="bi bi-shield-check me-1"></i>
                     {{ currentUser.roles[0].name }}

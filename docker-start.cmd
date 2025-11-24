@@ -20,7 +20,7 @@ echo =======================================
 echo Servicios iniciados correctamente!
 echo =======================================
 echo.
-echo Frontend:          http://localhost:4200
+echo Frontend:          http://localhost:4101
 echo MS Users:          http://localhost:8081
 echo MS Laboratorios:   http://localhost:8082
 echo MS Results:        http://localhost:8083
