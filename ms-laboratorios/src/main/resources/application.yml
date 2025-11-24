@@ -2,29 +2,19 @@ server:
   port: 8082
 
 spring:
+  profiles:
+    active: h2  # Profile por defecto: h2 (desarrollo), cambiar a 'oracle' para producción
+
   application:
     name: ms-laboratorios
 
-  datasource:
-    # Configuración Oracle Cloud ATP - fs3
-    # IMPORTANTE: Configure las siguientes variables de entorno antes de ejecutar:
-    # - DB_TNS_NAME: Nombre del servicio TNS (ej: fs3_tp)
-    # - TNS_ADMIN_PATH: Ruta al directorio del wallet Oracle (ej: ./wallet o ruta absoluta)
-    # - DB_USERNAME: Usuario de base de datos (ej: ADMIN)
-    # - DB_PASSWORD: Contraseña de base de datos (NUNCA versionar en git)
-    url: jdbc:oracle:thin:@${DB_TNS_NAME:fs3_tp}?TNS_ADMIN=${TNS_ADMIN_PATH:./wallet}
-    username: ${DB_USERNAME:ADMIN}
-    password: ${DB_PASSWORD}
-    driver-class-name: oracle.jdbc.OracleDriver
-
   jpa:
     hibernate:
-      # update: actualiza el schema automáticamente
-      # Temporalmente cambiado para crear tablas faltantes
-      ddl-auto: update
+      # validate: no modifica el schema, solo valida que coincida con las entidades
+      # Flyway se encarga de las migraciones
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
     # Evita lazy loading fuera de transacción
     open-in-view: false
@@ -32,7 +22,6 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
     validate-on-migrate: false
