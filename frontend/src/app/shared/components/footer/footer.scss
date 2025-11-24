@@ -1,0 +1,43 @@
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  margin-top: auto;
+  padding: 1rem 0;
+
+  p {
+    margin-bottom: 0.25rem;
+  }
+
+  .text-primary {
+    color: #0066cc !important;
+  }
+
+  .footer-links {
+    a {
+      color: #6c757d;
+      transition: color 0.2s;
+      font-size: 0.9rem;
+
+      &:hover {
+        color: #0066cc;
+      }
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    .footer-links {
+      margin-top: 0.5rem;
+
+      a {
+        display: inline-block;
+        margin: 0.25rem 0.5rem;
+      }
+    }
+  }
+}
