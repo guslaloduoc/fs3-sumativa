@@ -78,7 +78,7 @@ export class Register {
 
     const { fullName, email, password } = this.registerForm.value;
 
-    this.userService.createUser({
+    this.userService.create({
       fullName,
       email,
       passwordHash: password,
@@ -91,7 +91,7 @@ export class Register {
           this.router.navigate(['/auth/login']);
         }, 2000);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.isLoading = false;
         this.errorMessage = error.error?.error || 'Error al registrar usuario. Intenta nuevamente.';
       }
