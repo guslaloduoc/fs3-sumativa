@@ -1,0 +1,26 @@
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Angular
+dist
+.angular
+.vscode
+
+# Tests
+coverage
+.nyc_output
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentación
+*.md
+README.md
+
+# OS
+.DS_Store
+Thumbs.db

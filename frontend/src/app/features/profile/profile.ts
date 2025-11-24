@@ -23,10 +23,14 @@ export class Profile implements OnInit {
   errorMessage = '';
   successMessage = '';
 
+  showPassword = false;
+
   constructor() {
     this.profileForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      newPassword: ['', [Validators.minLength(6)]],
+      confirmPassword: ['']
     });
   }
 
@@ -35,36 +39,35 @@ export class Profile implements OnInit {
   }
 
   loadCurrentUser() {
-    const authData = this.authService.currentUserValue;
-    if (authData && authData.user) {
-      this.currentUser = authData.user;
-      this.profileForm.patchValue({
-        fullName: this.currentUser.fullName,
-        email: this.currentUser.email
-      });
-      this.profileForm.disable();
-    }
-  }
-
-  enableEditing() {
-    this.isEditing = true;
-    this.profileForm.enable();
-  }
-
-  cancelEditing() {
-    this.isEditing = false;
-    this.profileForm.disable();
-    // Restore original values
+    this.currentUser = this.authService.currentUser();
     if (this.currentUser) {
       this.profileForm.patchValue({
         fullName: this.currentUser.fullName,
         email: this.currentUser.email
       });
     }
-    this.errorMessage = '';
   }
 
-  saveProfile() {
+  resetForm() {
+    if (this.currentUser) {
+      this.profileForm.patchValue({
+        fullName: this.currentUser.fullName,
+        email: this.currentUser.email,
+        newPassword: '',
+        confirmPassword: ''
+      });
+    }
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  get passwordMismatch(): boolean {
+    const newPass = this.profileForm.get('newPassword')?.value;
+    const confirmPass = this.profileForm.get('confirmPassword')?.value;
+    return newPass && confirmPass && newPass !== confirmPass;
+  }
+
+  onSubmit() {
     if (this.profileForm.invalid) {
       Object.keys(this.profileForm.controls).forEach(key => {
         this.profileForm.get(key)?.markAsTouched();
@@ -77,27 +80,26 @@ export class Profile implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const updateData = {
+    const updateData: any = {
       fullName: this.profileForm.value.fullName,
       email: this.profileForm.value.email
     };
+
+    // Only include password if provided
+    if (this.profileForm.value.newPassword) {
+      if (this.passwordMismatch) {
+        this.errorMessage = 'Las contraseñas no coinciden';
+        return;
+      }
+      updateData.passwordHash = this.profileForm.value.newPassword;
+    }
 
     this.userService.update(this.currentUser.id, updateData).subscribe({
       next: (updatedUser) => {
         this.currentUser = updatedUser;
         this.successMessage = 'Perfil actualizado correctamente';
-        this.isEditing = false;
-        this.profileForm.disable();
         this.isLoading = false;
-
-        // Update session storage
-        const currentAuthData = this.authService.currentUserValue;
-        if (currentAuthData) {
-          currentAuthData.user = updatedUser;
-          sessionStorage.setItem('currentUser', JSON.stringify(currentAuthData));
-          this.authService['currentUserSubject'].next(currentAuthData);
-        }
-
+        this.profileForm.patchValue({ newPassword: '', confirmPassword: '' });
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
@@ -107,15 +109,8 @@ export class Profile implements OnInit {
     });
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
   get fullName() { return this.profileForm.get('fullName'); }
   get email() { return this.profileForm.get('email'); }
+  get newPassword() { return this.profileForm.get('newPassword'); }
+  get confirmPassword() { return this.profileForm.get('confirmPassword'); }
 }

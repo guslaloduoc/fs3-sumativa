@@ -1,392 +1,211 @@
-# Gestión de Laboratorios y Resultados de Análisis
+# Sistema de Gestion de Laboratorios - LabControl
 
-**Actividad Sumativa - Experiencia 1**
-**Asignatura:** Fullstack 3
-**Institución:** DuocUC
-
----
-
-## Descripción
-
-Sistema backend para la gestión de laboratorios clínicos, control de usuarios y asignación de análisis. Implementado con arquitectura de microservicios usando Spring Boot y Oracle Cloud Database.
-
-**Características principales:**
-- ✅ Arquitectura de microservicios con DTOs
-- ✅ Manejo centralizado de errores con @RestControllerAdvice
-- ✅ Logging estructurado con SLF4J
-- ✅ Validaciones de negocio robustas
-- ✅ Seguridad mediante externalización de credenciales
-- ✅ Tests unitarios con JUnit 5 y Mockito
-
----
+Sistema Full Stack para la gestion de laboratorios clinicos y resultados de analisis.
 
 ## Arquitectura
 
-El proyecto consta de 2 microservicios independientes:
+### Backend - Microservicios Spring Boot
+- ms-users (Puerto 8081): Gestion de usuarios y autenticacion
+- ms-laboratorios (Puerto 8082): Gestion de laboratorios y asignaciones
+- ms-results (Puerto 8083): Gestion de resultados de analisis
 
-### 1. **ms-users** (Puerto 8081)
+### Frontend - Angular 21
+- Puerto 4200: Interfaz de usuario responsive
+- Bootstrap 5 + Bootstrap Icons
+- Reactive Forms con validaciones
 
-Control de usuarios, roles e inicio de sesión.
+### Base de Datos
+- Oracle Cloud ATP (Autonomous Transaction Processing)
+- Wallet: sumativa/Wallet_fs3/
+- Flyway para migraciones
 
-**Funcionalidades:**
-- Gestión completa de usuarios (CRUD)
-- Sistema de roles y permisos
-- Login simple (texto plano según requerimientos académicos)
-- Validación de dominios de email autorizados (duocuc.cl, example.com)
-- Protección de usuarios ADMIN (no eliminables/no deshabilitables)
+## Instrucciones de Ejecucion
 
-### 2. **ms-laboratorios** (Puerto 8082)
+### Opcion 1: Con Docker (Recomendado)
 
-Gestión de laboratorios y asignación de pacientes para análisis clínicos.
+Prerrequisitos:
+- Docker Desktop instalado
+- Docker Compose instalado
 
-**Funcionalidades:**
-- Gestión de laboratorios clínicos (CRUD)
-- Asignación de pacientes a laboratorios
-- Validación de nombres únicos
-- Validación de formato de teléfono (7-15 dígitos)
-- Protección contra eliminación de laboratorios con asignaciones activas
+Paso 1 - Configurar variables de entorno:
+```
+cd sumativa
+copy .env.example .env
+# Editar .env con tus credenciales de Oracle Cloud
+```
 
----
+Paso 2 - Iniciar todos los servicios:
+```
+# Windows
+docker-start.cmd
 
-## Tecnologías
+# O manualmente
+docker-compose up -d --build
+```
 
-- **Java:** 21
-- **Spring Boot:** 3.3.4
-- **Base de Datos:** Oracle Cloud ATP (Autonomous Transaction Processing)
-- **ORM:** Hibernate + JPA
-- **Migraciones:** Flyway
-- **Build:** Maven
-- **Validación:** Bean Validation (javax.validation)
-- **Logging:** SLF4J + Logback
-- **Testing:** JUnit 5 + Mockito
-- **Mapeo:** DTOs con mappers personalizados
+Paso 3 - Acceder a la aplicacion:
+- Frontend: http://localhost:4200
+- MS Users: http://localhost:8081
+- MS Laboratorios: http://localhost:8082
+- MS Results: http://localhost:8083
 
----
+Comandos utiles:
+```
+# Ver logs
+docker-compose logs -f
 
-## Instalación y Ejecución
+# Detener servicios
+docker-compose down
 
-### Requisitos previos:
+# Reconstruir imagenes
+docker-compose build --no-cache
+```
 
-- Java 21 o superior
+### Opcion 2: Ejecucion Local (Sin Docker)
+
+Prerrequisitos:
+- Java 21
+- Node.js 20+
 - Maven 3.x
-- Acceso a Oracle Cloud ATP (wallet configurado)
+- Oracle Cloud ATP configurado
 
-### 1. Configurar variables de entorno
-
-Crear archivo `.env` en la raíz del proyecto (basado en `.env.example`):
-
-```properties
-DB_TNS_NAME=fs3_tp
-TNS_ADMIN_PATH=./wallet
-DB_USERNAME=ADMIN
-DB_PASSWORD=tu_password_aqui
+Terminal 1 - MS Users:
 ```
-
-📖 **Ver guía completa:** [SECURITY_SETUP.md](SECURITY_SETUP.md)
-
-### 2. Ejecutar ms-users:
-
-```bash
-cd ms-users
+cd sumativa/ms-users
 ./mvnw.cmd clean spring-boot:run
 ```
 
-**Puerto:** http://localhost:8081
-
-### 3. Ejecutar ms-laboratorios:
-
-```bash
-cd ms-laboratorios
+Terminal 2 - MS Laboratorios:
+```
+cd sumativa/ms-laboratorios
 ./mvnw.cmd clean spring-boot:run
 ```
 
-**Puerto:** http://localhost:8082
+Terminal 3 - MS Results:
+```
+cd sumativa/ms-results
+./mvnw.cmd clean spring-boot:run
+```
 
----
+Terminal 4 - Frontend:
+```
+cd sumativa/frontend
+npm install
+npm start
+```
 
-## Estructura del Proyecto
+Acceder a: http://localhost:4200
+
+## Usuarios de Prueba
+
+Usuario Administrador:
+- Email: admin@labcontrol.com
+- Password: Admin123!
+- Acceso: Completo (Usuarios, Laboratorios, Resultados)
+
+Usuario Paciente:
+- Email: patient@labcontrol.com
+- Password: Patient123!
+- Acceso: Dashboard, Laboratorios (lectura), Resultados (lectura)
+
+## Caracteristicas del Frontend
+
+### Autenticacion
+- Login con validacion
+- Registro con validaciones de password fuerte
+- Recuperacion de password
+- Proteccion de rutas por roles
+
+### Gestion de Usuarios (Solo ADMIN)
+- CRUD completo de usuarios
+- Gestion de roles
+- Habilitar/Deshabilitar usuarios
+
+### Gestion de Laboratorios
+- Vista en cards responsive
+- CRUD completo (Solo ADMIN)
+
+### Gestion de Resultados
+- CRUD completo
+- Permisos: ADMIN y LAB_TECH
+
+## APIs Endpoints
+
+MS-Users (8081):
+- POST /api/users/login
+- GET /api/users
+- POST /api/users
+- PUT /api/users/{id}
+- DELETE /api/users/{id}
+
+MS-Laboratorios (8082):
+- GET /laboratorios
+- POST /laboratorios
+- PUT /laboratorios/{id}
+- DELETE /laboratorios/{id}
+
+MS-Results (8083):
+- GET /api/resultados
+- POST /api/resultados
+- PUT /api/resultados/{id}
+- DELETE /api/resultados/{id}
+
+## Tecnologias
+
+Backend: Java 21, Spring Boot 3.3.4, Oracle JDBC, Flyway
+Frontend: Angular 21, TypeScript, Bootstrap 5
+Base de Datos: Oracle Cloud ATP
+Contenedores: Docker, Docker Compose, Nginx
+
+## Arquitectura Docker
+
+### Imagenes
+- labcontrol-frontend: Nginx + Angular (Puerto 80 -> 4200)
+- labcontrol-ms-users: Spring Boot (Puerto 8081)
+- labcontrol-ms-laboratorios: Spring Boot (Puerto 8082)
+- labcontrol-ms-results: Spring Boot (Puerto 8083)
+
+### Red
+- labcontrol-network: Red bridge para comunicacion entre contenedores
+
+### Volumenes
+- Wallet_fs3: Montado como read-only en todos los microservicios
+
+### Health Checks
+Todos los servicios tienen health checks configurados:
+- Frontend: cada 30s
+- Backend: cada 30s con 60s de inicio
+
+## Estructura de Archivos Docker
 
 ```
 sumativa/
-├── ms-users/                          # Microservicio de usuarios
-│   ├── src/main/java/
-│   │   └── com/sumativa/ms_usuarios/
-│   │       ├── controller/            # Endpoints REST
-│   │       ├── service/               # Lógica de negocio
-│   │       ├── repository/            # Acceso a datos (JpaRepository)
-│   │       ├── entity/                # Entidades JPA (User, Role)
-│   │       ├── dto/                   # DTOs (Request/Response)
-│   │       ├── mapper/                # Conversión Entity <-> DTO
-│   │       ├── exception/             # GlobalExceptionHandler
-│   │       └── config/                # Configuración + DataInitializer
-│   ├── src/main/resources/
-│   │   ├── application.yml            # Configuración de Spring
-│   │   └── db/migration/              # Scripts Flyway
-│   ├── src/test/java/                 # Tests unitarios
-│   │   ├── mapper/                    # Tests de mappers
-│   │   └── service/                   # Tests de validaciones
-│   └── pom.xml
+├── docker-compose.yml          # Orquestacion de servicios
+├── .env                        # Variables de entorno (NO subir a git)
+├── .env.example               # Ejemplo de variables
+├── docker-start.cmd           # Script de inicio Windows
+├── docker-stop.cmd            # Script de parada Windows
+├── docker-logs.cmd            # Script para ver logs
 │
-├── ms-laboratorios/                   # Microservicio de laboratorios
-│   ├── src/main/java/
-│   │   └── com/sumativa/ms_laboratorios/
-│   │       ├── controller/            # Endpoints REST
-│   │       ├── service/               # Lógica de negocio
-│   │       ├── repository/            # Acceso a datos
-│   │       ├── entity/                # Entidades JPA (Laboratorio, Asignacion)
-│   │       ├── dto/                   # DTOs (Request/Response)
-│   │       ├── mapper/                # Conversión Entity <-> DTO
-│   │       ├── exception/             # GlobalExceptionHandler
-│   │       └── config/                # Configuración + DataInitializer
-│   ├── src/main/resources/
-│   │   ├── application.yml            # Configuración de Spring
-│   │   └── db/migration/              # Scripts Flyway
-│   ├── src/test/java/                 # Tests unitarios
-│   │   ├── mapper/                    # Tests de mappers
-│   │   └── service/                   # Tests de validaciones
-│   └── pom.xml
+├── frontend/
+│   ├── Dockerfile             # Build multi-stage Angular + Nginx
+│   ├── nginx.conf             # Configuracion Nginx
+│   └── .dockerignore          # Archivos a excluir del build
 │
-├── Wallet_fs3/                        # Oracle Cloud Wallet (no versionado)
-├── .env.example                       # Template de variables de entorno
-├── .gitignore                         # Excluye wallet y credenciales
-├── API_DOCUMENTATION.md               # Documentación completa de API
-├── SECURITY_SETUP.md                  # Guía de configuración segura
-├── DuocUC_Fullstack3_Microservices.postman_collection.json
-└── README.md (este archivo)
+├── ms-users/
+│   ├── Dockerfile             # Build multi-stage Maven + JRE
+│   └── .dockerignore
+│
+├── ms-laboratorios/
+│   ├── Dockerfile
+│   └── .dockerignore
+│
+└── ms-results/
+    ├── Dockerfile
+    └── .dockerignore
 ```
 
----
+## Proyecto
 
-## Credenciales de Prueba
-
-### ms-users (Usuarios de prueba precargados)
-
-```
-Admin:    admin@example.com / admin123
-Doctor:   juan.perez@duocuc.cl / doctor123
-Lab Tech: maria.gonzalez@duocuc.cl / lab123
-```
-
-### Base de Datos Oracle
-
-⚠️ **IMPORTANTE:** Las credenciales deben configurarse mediante variables de entorno:
-
-```bash
-# Configurar en .env (no versionado)
-DB_TNS_NAME=fs3_tp
-TNS_ADMIN_PATH=./wallet
-DB_USERNAME=ADMIN
-DB_PASSWORD=tu_password_aqui
-```
-
-Ver [SECURITY_SETUP.md](SECURITY_SETUP.md) para más detalles.
-
----
-
-## Endpoints Principales
-
-### ms-users (http://localhost:8081)
-
-| Método | Endpoint                           | Descripción            |
-| ------ | ---------------------------------- | ---------------------- |
-| GET    | `/api/users`                       | Listar usuarios        |
-| POST   | `/api/users`                       | Crear usuario          |
-| GET    | `/api/users/{id}`                  | Obtener usuario por ID |
-| PUT    | `/api/users/{id}`                  | Actualizar usuario     |
-| DELETE | `/api/users/{id}`                  | Eliminar usuario       |
-| POST   | `/api/users/login`                 | Iniciar sesión         |
-| POST   | `/api/users/{id}/roles/{roleName}` | Asignar rol            |
-
-### ms-laboratorios (http://localhost:8082)
-
-| Método | Endpoint             | Descripción            |
-| ------ | -------------------- | ---------------------- |
-| GET    | `/laboratorios`      | Listar laboratorios    |
-| POST   | `/laboratorios`      | Crear laboratorio      |
-| GET    | `/laboratorios/{id}` | Obtener laboratorio    |
-| PUT    | `/laboratorios/{id}` | Actualizar laboratorio |
-| DELETE | `/laboratorios/{id}` | Eliminar laboratorio   |
-| GET    | `/asignaciones`      | Listar asignaciones    |
-| POST   | `/asignaciones`      | Crear asignación       |
-
-📖 **Documentación completa de API con DTOs, ejemplos y manejo de errores:** [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
-
----
-
-## Pruebas con Postman
-
-1. Importar la colección: `DuocUC_Fullstack3_Microservices.postman_collection.json`
-
----
-
-## Base de Datos
-
-### ms-users
-
-- **users** - Información de usuarios
-- **roles** - Roles del sistema
-- **user_roles** - Relación Many-to-Many
-
-### ms-laboratorios
-
-- **laboratorios** - Información de laboratorios clínicos
-- **asignaciones** - Asignación de pacientes a laboratorios
-
-**Datos iniciales:**
-
-- 3 usuarios con diferentes roles
-- 3 laboratorios (Santiago, Viña del Mar, La Serena)
-- 5 asignaciones de pacientes
-
----
-
-## Configuración
-
-### Modificar puerto del servidor:
-
-Editar `src/main/resources/application.yml`:
-
-```yaml
-server:
-  port: 8081 # Cambiar según necesidad
-```
-
-### Configurar base de datos:
-
-⚠️ **IMPORTANTE:** No codifiques credenciales en `application.yml`. Usa variables de entorno:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:oracle:thin:@${DB_TNS_NAME:fs3_tp}?TNS_ADMIN=${TNS_ADMIN_PATH:./wallet}
-    username: ${DB_USERNAME:ADMIN}
-    password: ${DB_PASSWORD}
-```
-
-Las credenciales reales deben configurarse en `.env` (ver sección Instalación).
-
----
-
-## Roles del Sistema
-
-- **ADMIN** - Administrador con acceso total
-- **DOCTOR** - Médicos del sistema
-- **LAB_TECH** - Técnicos de laboratorio
-- **USER** - Usuario estándar
-
----
-
-## Notas Importantes
-
-- Las contraseñas se almacenan en **texto plano** según requerimientos académicos
-- No se implementa sistema de pagos (fuera del alcance)
-- Solo BackEnd, sin interfaz gráfica
-- Ambos microservicios deben estar ejecutándose para pruebas completas
-
----
-
-## Arquitectura Técnica
-
-### DTOs (Data Transfer Objects)
-
-Cada microservicio implementa una capa completa de DTOs para separar la representación de datos de la lógica de dominio:
-
-**ms-users:**
-- `UserResponseDto` - Respuestas de usuario (sin `passwordHash` por seguridad)
-- `UserCreateDto` - Creación de usuarios con validaciones Bean Validation
-- `UserUpdateDto` - Actualizaciones parciales (campos opcionales)
-- `RoleResponseDto` - Información de roles
-- `LoginRequest` / `LoginResponse` - Autenticación
-
-**ms-laboratorios:**
-- `LaboratorioResponseDto`, `LaboratorioCreateDto`, `LaboratorioUpdateDto`
-- `AsignacionResponseDto`, `AsignacionCreateDto`, `AsignacionUpdateDto`
-
-**Mappers:**
-Clases utilitarias estáticas (`UserMapper`, `LaboratorioMapper`, `AsignacionMapper`) para conversión entre entidades y DTOs.
-
-### Manejo Centralizado de Errores
-
-Implementado mediante `@RestControllerAdvice` con `GlobalExceptionHandler`:
-
-**Estructura consistente de errores:**
-```json
-{
-  "timestamp": "2025-11-19T15:45:00",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Descripción del error",
-  "path": "/api/users",
-  "fieldErrors": {
-    "campo": "mensaje de validación"
-  }
-}
-```
-
-**Excepciones manejadas:**
-- `MethodArgumentNotValidException` → 400 (errores de validación Bean Validation)
-- `IllegalArgumentException` → 400 (errores de negocio)
-- `NoSuchElementException` → 404 (recurso no encontrado)
-- `Exception` → 500 (errores inesperados)
-
-### Validaciones de Negocio
-
-**ms-users:**
-1. **Validación de dominio de email:** Solo se permiten emails con dominios `duocuc.cl` o `example.com`
-2. **Protección de ADMIN:** No se pueden eliminar usuarios con rol ADMIN
-3. **Usuario ADMIN principal:** El usuario `admin@example.com` no puede ser deshabilitado
-
-**ms-laboratorios:**
-1. **Nombres únicos:** No se permiten laboratorios con nombres duplicados (case-insensitive)
-2. **Validación de teléfono:** Formato validado (7-15 dígitos, acepta espacios, guiones, paréntesis)
-3. **Protección de datos:** No se pueden eliminar laboratorios con asignaciones activas
-
-### Logging Estructurado
-
-Implementado con **SLF4J + Logback** (`@Slf4j`):
-
-- **INFO:** Operaciones exitosas (creación, actualización, eliminación, login)
-- **WARN:** Validaciones fallidas, recursos no encontrados
-- **ERROR:** Errores inesperados del servidor
-
-**Seguridad:** Las contraseñas NUNCA se registran en logs.
-
-### Testing
-
-Tests unitarios con **JUnit 5 + Mockito**:
-
-**ms-users:**
-- `UserMapperTest` - Tests de conversión Entity ↔ DTO
-- `UserServiceValidationTest` - Tests de reglas de negocio
-
-**ms-laboratorios:**
-- `LaboratorioMapperTest` - Tests de mappers
-- `LaboratorioServiceValidationTest` - Tests de validaciones
-
-**Ejecutar tests:**
-```bash
-# Desde el directorio de cada microservicio
-./mvnw.cmd test
-
-# Con reporte de cobertura (JaCoCo)
-./mvnw.cmd clean test jacoco:report
-# Ver reporte: target/site/jacoco/index.html
-```
-
----
-
-## Documentación Adicional
-
-- 📄 [API_DOCUMENTATION.md](API_DOCUMENTATION.md) - Documentación completa de API con ejemplos de request/response
-- 🔒 [SECURITY_SETUP.md](SECURITY_SETUP.md) - Guía de configuración segura de wallet y credenciales
-- 📋 [.env.example](.env.example) - Template de variables de entorno
-
----
-
-## Licencia
-
-Proyecto académico - DuocUC 2025
-
----
-
-**Desarrollado con:** Spring Boot, Oracle Cloud, Java 21
+Evaluacion Sumativa - Desarrollo Full Stack III (DSY2205)
+DuocUC - 2025

@@ -1,0 +1,144 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+}
+
+.welcome-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.stat-card {
+  border-radius: 12px;
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.75rem;
+
+    &.bg-primary {
+      background: linear-gradient(135deg, #0066cc, #0052a3);
+    }
+
+    &.bg-success {
+      background: linear-gradient(135deg, #28a745, #20803a);
+    }
+
+    &.bg-info {
+      background: linear-gradient(135deg, #17a2b8, #117a8b);
+    }
+
+    &.bg-warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: #333;
+    }
+  }
+
+  h6 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  h3 {
+    font-weight: 700;
+    color: #333;
+  }
+}
+
+.action-card {
+  border-radius: 12px;
+  transition: all 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+
+    i {
+      transform: scale(1.1);
+    }
+  }
+
+  i {
+    transition: transform 0.3s;
+  }
+
+  h6 {
+    color: #333;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+.card {
+  &.border-0 {
+    border-radius: 12px;
+  }
+
+  .card-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 1rem 1.5rem;
+
+    h5 {
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+
+  &.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-card {
+    .card-body {
+      padding: 2rem 1.5rem !important;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .stat-card {
+    h3 {
+      font-size: 1.75rem;
+    }
+  }
+
+  .action-card {
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 2rem !important;
+    }
+  }
+}

@@ -1,91 +1,240 @@
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-12">
-      <h2 class="mb-4">
-        <i class="bi bi-speedometer2 me-2"></i>
-        Bienvenido, {{ currentUser?.fullName }}
-      </h2>
-    </div>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="card text-white bg-primary">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title">Usuarios</h6>
-              <h2 class="mb-0">-</h2>
+<div class="dashboard-container">
+  <div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="welcome-card card border-0 shadow-sm bg-gradient-primary text-white">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">
+                  <i class="bi bi-hand-wave-fill me-2"></i>
+                  ¡Bienvenido, {{ currentUser?.fullName }}!
+                </h2>
+                <p class="mb-0 opacity-90">
+                  Sistema de Gestión de Laboratorios - {{ currentUser?.email }}
+                </p>
+                @if (currentUser?.roles && currentUser.roles.length > 0) {
+                  <span class="badge bg-light text-primary mt-2">
+                    <i class="bi bi-shield-check me-1"></i>
+                    {{ currentUser.roles[0].name }}
+                  </span>
+                }
+              </div>
+              <div class="col-md-4 text-end d-none d-md-block">
+                <i class="bi bi-heart-pulse-fill" style="font-size: 4rem; opacity: 0.3;"></i>
+              </div>
             </div>
-            <i class="bi bi-people" style="font-size: 3rem; opacity: 0.5;"></i>
           </div>
-          <a routerLink="/users" class="text-white text-decoration-none d-block mt-3">
-            Ver todos <i class="bi bi-arrow-right"></i>
-          </a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card text-white bg-success">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title">Laboratorios</h6>
-              <h2 class="mb-0">-</h2>
-            </div>
-            <i class="bi bi-building" style="font-size: 3rem; opacity: 0.5;"></i>
-          </div>
-          <a routerLink="/laboratories" class="text-white text-decoration-none d-block mt-3">
-            Ver todos <i class="bi bi-arrow-right"></i>
-          </a>
+    @if (authService.hasRole('ADMIN')) {
+      <!-- Admin Dashboard -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h4 class="mb-3">
+            <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+            Panel de Administración
+          </h4>
         </div>
       </div>
-    </div>
 
-    <div class="col-md-4">
-      <div class="card text-white bg-info">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="card-title">Resultados</h6>
-              <h2 class="mb-0">-</h2>
+      <!-- Statistics Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="stat-icon bg-primary">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="ms-3">
+                  <h6 class="text-muted mb-1">Total Usuarios</h6>
+                  <h3 class="mb-0">156</h3>
+                </div>
+              </div>
             </div>
-            <i class="bi bi-clipboard-data" style="font-size: 3rem; opacity: 0.5;"></i>
           </div>
-          <a routerLink="/results" class="text-white text-decoration-none d-block mt-3">
-            Ver todos <i class="bi bi-arrow-right"></i>
-          </a>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="stat-icon bg-success">
+                  <i class="bi bi-building"></i>
+                </div>
+                <div class="ms-3">
+                  <h6 class="text-muted mb-1">Laboratorios</h6>
+                  <h3 class="mb-0">12</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="stat-icon bg-info">
+                  <i class="bi bi-file-medical-fill"></i>
+                </div>
+                <div class="ms-3">
+                  <h6 class="text-muted mb-1">Resultados Hoy</h6>
+                  <h3 class="mb-0">48</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="stat-icon bg-warning">
+                  <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="ms-3">
+                  <h6 class="text-muted mb-1">Pendientes</h6>
+                  <h3 class="mb-0">7</h3>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="row mt-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header bg-light">
-          <h5 class="mb-0">
-            <i class="bi bi-info-circle me-2"></i>
-            Sistema de Gestión de Laboratorios
+      <!-- Quick Actions -->
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <h5 class="mb-3">
+            <i class="bi bi-lightning-fill me-2 text-warning"></i>
+            Acciones Rápidas
           </h5>
         </div>
-        <div class="card-body">
-          <p class="mb-2"><strong>Email:</strong> {{ currentUser?.email }}</p>
-          <p class="mb-2"><strong>Roles:</strong>
-            @for (role of currentUser?.roles; track role.id) {
-              <span class="badge bg-secondary me-1">{{ role.name }}</span>
-            }
-          </p>
-          <p class="mb-0"><strong>Estado:</strong>
-            @if (currentUser?.enabled) {
-              <span class="badge bg-success">Activo</span>
-            } @else {
-              <span class="badge bg-danger">Inactivo</span>
-            }
-          </p>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <a routerLink="/users" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-person-plus-fill text-primary mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="mb-2">Gestionar Usuarios</h6>
+                <p class="text-muted mb-0 small">Crear, editar y administrar usuarios del sistema</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <a routerLink="/laboratories" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-building-add text-success mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="mb-2">Gestionar Laboratorios</h6>
+                <p class="text-muted mb-0 small">Administrar información de laboratorios</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <a routerLink="/results" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-file-earmark-medical text-info mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="mb-2">Ver Resultados</h6>
+                <p class="text-muted mb-0 small">Revisar y gestionar todos los resultados</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <a href="#" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-graph-up-arrow text-warning mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="mb-2">Reportes</h6>
+                <p class="text-muted mb-0 small">Generar informes y estadísticas</p>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
-    </div>
+
+    } @else {
+      <!-- Patient Dashboard -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h4 class="mb-3">
+            <i class="bi bi-clipboard2-pulse-fill me-2 text-primary"></i>
+            Mis Resultados
+          </h4>
+        </div>
+      </div>
+
+      <!-- Patient Quick Actions -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <a routerLink="/results" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-file-medical-fill text-primary mb-3" style="font-size: 3rem;"></i>
+                <h5 class="mb-2">Mis Resultados</h5>
+                <p class="text-muted mb-0">Ver todos mis resultados de laboratorio</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+          <a routerLink="/laboratories" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-building text-success mb-3" style="font-size: 3rem;"></i>
+                <h5 class="mb-2">Laboratorios</h5>
+                <p class="text-muted mb-0">Información de laboratorios disponibles</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+          <a routerLink="/profile" class="text-decoration-none">
+            <div class="card action-card border-0 shadow-sm h-100">
+              <div class="card-body text-center p-4">
+                <i class="bi bi-person-gear text-info mb-3" style="font-size: 3rem;"></i>
+                <h5 class="mb-2">Mi Perfil</h5>
+                <p class="text-muted mb-0">Gestionar mi información personal</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Results -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2 text-primary"></i>
+                Resultados Recientes
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                No hay resultados recientes para mostrar.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 </div>

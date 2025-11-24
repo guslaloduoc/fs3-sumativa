@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, roleGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/auth/login',
     pathMatch: 'full'
   },
   {
@@ -37,7 +37,7 @@ export const routes: Routes = [
   {
     path: 'users',
     loadComponent: () => import('./features/users/users').then(m => m.Users),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard('ADMIN')]
   },
   {
     path: 'laboratories',
@@ -51,6 +51,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/dashboard'
+    redirectTo: '/auth/login'
   }
 ];
