@@ -5,6 +5,7 @@ import com.sumativa.ms_usuarios.entity.User;
 import com.sumativa.ms_usuarios.repository.RoleRepository;
 import com.sumativa.ms_usuarios.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 /**
  * Servicio para gestión de usuarios
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,10 +59,16 @@ public class UserService {
      */
     @Transactional
     public User createUser(User user) {
+        log.info("Creating user with email: {}", user.getEmail());
+
         // Verificar que el email no esté en uso
         if (existsByEmail(user.getEmail())) {
+            log.warn("Attempt to create user with existing email: {}", user.getEmail());
             throw new IllegalArgumentException("El email ya está registrado: " + user.getEmail());
         }
+
+        // Validación de negocio: Validar dominio de email autorizado
+        validateEmailDomain(user.getEmail());
 
         // Asegurar valores por defecto
         if (user.getEnabled() == null) {
@@ -79,7 +87,9 @@ public class UserService {
             }
         }
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        log.info("User created successfully with id: {} and email: {}", savedUser.getId(), savedUser.getEmail());
+        return savedUser;
     }
 
     /**
@@ -87,8 +97,13 @@ public class UserService {
      */
     @Transactional
     public User updateUser(Long id, User userDetails) {
+        log.info("Updating user with id: {}", id);
+
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + id));
+            .orElseThrow(() -> {
+                log.warn("User not found with id: {}", id);
+                return new IllegalArgumentException("Usuario no encontrado con id: " + id);
+            });
 
         // Actualizar campos
         if (userDetails.getFullName() != null) {
@@ -98,6 +113,7 @@ public class UserService {
         if (userDetails.getEmail() != null && !userDetails.getEmail().equalsIgnoreCase(user.getEmail())) {
             // Verificar que el nuevo email no esté en uso
             if (existsByEmail(userDetails.getEmail())) {
+                log.warn("Attempt to update to existing email: {}", userDetails.getEmail());
                 throw new IllegalArgumentException("El email ya está registrado: " + userDetails.getEmail());
             }
             user.setEmail(userDetails.getEmail());
@@ -121,7 +137,9 @@ public class UserService {
             }
         }
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        log.info("User updated successfully with id: {}", updatedUser.getId());
+        return updatedUser;
     }
 
     /**
@@ -129,10 +147,25 @@ public class UserService {
      */
     @Transactional
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuario no encontrado con id: " + id);
+        log.info("Deleting user with id: {}", id);
+
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("User not found with id: {}", id);
+                return new IllegalArgumentException("Usuario no encontrado con id: " + id);
+            });
+
+        // Validación de negocio: No permitir eliminar usuarios con rol ADMIN
+        boolean hasAdminRole = user.getRoles().stream()
+            .anyMatch(role -> "ADMIN".equalsIgnoreCase(role.getName()));
+
+        if (hasAdminRole) {
+            log.warn("Attempt to delete user with ADMIN role, id: {}", id);
+            throw new IllegalArgumentException("No se puede eliminar un usuario con rol ADMIN");
         }
+
         userRepository.deleteById(id);
+        log.info("User deleted successfully with id: {}", id);
     }
 
     /**
@@ -142,6 +175,13 @@ public class UserService {
     public User toggleUserEnabled(Long id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + id));
+
+        // Validación de negocio: No permitir deshabilitar el usuario ADMIN principal
+        if ("admin@example.com".equalsIgnoreCase(user.getEmail()) && user.getEnabled()) {
+            log.warn("Attempt to disable primary ADMIN user: {}", user.getEmail());
+            throw new IllegalArgumentException("No se puede deshabilitar el usuario ADMIN principal");
+        }
+
         user.setEnabled(!user.getEnabled());
         return userRepository.save(user);
     }
@@ -151,6 +191,8 @@ public class UserService {
      */
     @Transactional
     public User assignRole(Long userId, String roleName) {
+        log.info("Assigning role {} to user with id: {}", roleName, userId);
+
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + userId));
 
@@ -158,7 +200,9 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + roleName));
 
         user.getRoles().add(role);
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        log.info("Role {} assigned successfully to user with id: {}", roleName, userId);
+        return updatedUser;
     }
 
     /**
@@ -181,16 +225,38 @@ public class UserService {
      * Valida email y password en texto plano
      */
     public Optional<User> login(String email, String password) {
+        log.info("Login attempt for email: {}", email);
+
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // Validar password en texto plano
+            // Validar password en texto plano (NO loggear contraseña)
             if (user.getPasswordHash().equals(password) && user.getEnabled()) {
+                log.info("Login successful for user: {}", email);
                 return Optional.of(user);
             }
         }
 
+        log.warn("Login failed for email: {} (invalid credentials or disabled user)", email);
         return Optional.empty();
+    }
+
+    /**
+     * Valida que el email pertenezca a un dominio autorizado
+     * Dominios permitidos: duocuc.cl, example.com
+     */
+    private void validateEmailDomain(String email) {
+        if (email == null || !email.contains("@")) {
+            throw new IllegalArgumentException("Email inválido");
+        }
+
+        String domain = email.substring(email.lastIndexOf("@") + 1).toLowerCase();
+        List<String> allowedDomains = List.of("duocuc.cl", "example.com");
+
+        if (!allowedDomains.contains(domain)) {
+            log.warn("Attempt to create user with unauthorized domain: {}", domain);
+            throw new IllegalArgumentException("Dominio de email no autorizado. Dominios permitidos: duocuc.cl, example.com");
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.sumativa.ms_usuarios.dto;
 
-import com.sumativa.ms_usuarios.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,7 @@ import java.util.Set;
 
 /**
  * DTO para la respuesta de inicio de sesión exitoso
+ * Utiliza RoleResponseDto en lugar de entidades Role
  */
 @Data
 @NoArgsConstructor
@@ -21,11 +21,11 @@ public class LoginResponse {
     private String email;
     private Boolean enabled;
     private LocalDateTime createdAt;
-    private Set<Role> roles;
+    private Set<RoleResponseDto> roles;
     private String message;
 
     public LoginResponse(Long id, String fullName, String email, Boolean enabled,
-                         LocalDateTime createdAt, Set<Role> roles) {
+                         LocalDateTime createdAt, Set<RoleResponseDto> roles) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;

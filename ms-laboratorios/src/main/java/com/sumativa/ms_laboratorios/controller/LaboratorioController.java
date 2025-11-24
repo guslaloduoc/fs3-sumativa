@@ -1,6 +1,10 @@
 package com.sumativa.ms_laboratorios.controller;
 
+import com.sumativa.ms_laboratorios.dto.LaboratorioCreateDto;
+import com.sumativa.ms_laboratorios.dto.LaboratorioResponseDto;
+import com.sumativa.ms_laboratorios.dto.LaboratorioUpdateDto;
 import com.sumativa.ms_laboratorios.entity.Laboratorio;
+import com.sumativa.ms_laboratorios.mapper.LaboratorioMapper;
 import com.sumativa.ms_laboratorios.service.LaboratorioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Controlador REST para gestión de laboratorios
@@ -23,61 +29,63 @@ public class LaboratorioController {
 
     /**
      * GET /laboratorios - Listar todos los laboratorios
+     * @return Lista de LaboratorioResponseDto
      */
     @GetMapping
-    public ResponseEntity<List<Laboratorio>> findAll() {
-        return ResponseEntity.ok(laboratorioService.findAll());
+    public ResponseEntity<List<LaboratorioResponseDto>> findAll() {
+        List<Laboratorio> laboratorios = laboratorioService.findAll();
+        List<LaboratorioResponseDto> responseDtos = laboratorios.stream()
+            .map(LaboratorioMapper::toResponseDto)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(responseDtos);
     }
 
     /**
      * GET /laboratorios/{id} - Obtener laboratorio por ID
+     * @return LaboratorioResponseDto
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        return laboratorioService.findById(id)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Laboratorio no encontrado con id: " + id)));
+    public ResponseEntity<LaboratorioResponseDto> findById(@PathVariable Long id) {
+        Laboratorio laboratorio = laboratorioService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Laboratorio no encontrado con id: " + id));
+        return ResponseEntity.ok(LaboratorioMapper.toResponseDto(laboratorio));
     }
 
     /**
      * POST /laboratorios - Crear nuevo laboratorio
+     * @param createDto Datos del laboratorio a crear
+     * @return LaboratorioResponseDto del laboratorio creado
      */
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody Laboratorio laboratorio) {
-        try {
-            Laboratorio created = laboratorioService.create(laboratorio);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<LaboratorioResponseDto> create(@Valid @RequestBody LaboratorioCreateDto createDto) {
+        Laboratorio laboratorio = LaboratorioMapper.toEntity(createDto);
+        Laboratorio created = laboratorioService.create(laboratorio);
+        LaboratorioResponseDto responseDto = LaboratorioMapper.toResponseDto(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     /**
      * PUT /laboratorios/{id} - Actualizar laboratorio existente
+     * @param updateDto Datos del laboratorio a actualizar (campos opcionales)
+     * @return LaboratorioResponseDto del laboratorio actualizado
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Laboratorio laboratorio) {
-        try {
-            Laboratorio updated = laboratorioService.update(id, laboratorio);
-            return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<LaboratorioResponseDto> update(@PathVariable Long id, @Valid @RequestBody LaboratorioUpdateDto updateDto) {
+        Laboratorio laboratorio = laboratorioService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Laboratorio no encontrado con id: " + id));
+
+        LaboratorioMapper.updateEntityFromDto(laboratorio, updateDto);
+        Laboratorio updated = laboratorioService.update(id, laboratorio);
+        LaboratorioResponseDto responseDto = LaboratorioMapper.toResponseDto(updated);
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
      * DELETE /laboratorios/{id} - Eliminar laboratorio
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            laboratorioService.delete(id);
-            return ResponseEntity.ok(Map.of("message", "Laboratorio eliminado exitosamente"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        laboratorioService.delete(id);
+        return ResponseEntity.ok(Map.of("message", "Laboratorio eliminado exitosamente"));
     }
 }

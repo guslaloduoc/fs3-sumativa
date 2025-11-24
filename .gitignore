@@ -1,0 +1,44 @@
+# Oracle Cloud Wallet - CRITICAL: Contains database credentials
+Wallet_*/
+Wallet_*.zip
+
+# Environment variables with real credentials
+.env
+.env.local
+.env.*.local
+
+# Only ignore application files if they contain hardcoded credentials
+# Since we use environment variables now, application.yml files CAN be versioned
+# **/application.yml  <-- COMMENTED OUT - files now use ${DB_PASSWORD} placeholders
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+*.sts4-cache
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
