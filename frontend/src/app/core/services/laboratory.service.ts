@@ -7,7 +7,7 @@ import { Laboratory, CreateLaboratoryRequest, UpdateLaboratoryRequest } from '..
   providedIn: 'root'
 })
 export class LaboratoryService {
-  private readonly API_URL = 'http://localhost:8082/laboratorios';
+  private readonly API_URL = 'http://localhost:8082/api/laboratorios';
 
   constructor(private http: HttpClient) {}
 

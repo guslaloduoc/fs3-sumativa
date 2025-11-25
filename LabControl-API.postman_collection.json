@@ -1,0 +1,698 @@
+{
+	"info": {
+		"_postman_id": "labcontrol-api-2025",
+		"name": "LabControl API - Complete Collection",
+		"description": "Colección completa de endpoints para el sistema LabControl con 3 microservicios:\n- MS Users (puerto 8081)\n- MS Laboratorios (puerto 8082)\n- MS Results (puerto 8083)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "MS-USERS (8081)",
+			"item": [
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Login - Admin",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@hospital.cl\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/users/login",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "login"]
+								},
+								"description": "Inicio de sesión con usuario Admin"
+							}
+						},
+						{
+							"name": "Login - Doctor",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"juan.perez@hospital.cl\",\n  \"password\": \"doctor123\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/users/login",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "login"]
+								},
+								"description": "Inicio de sesión con usuario Doctor"
+							}
+						},
+						{
+							"name": "Login - Lab Tech",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"maria.gonzalez@hospital.cl\",\n  \"password\": \"lab123\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/users/login",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "login"]
+								},
+								"description": "Inicio de sesión con usuario Técnico de Laboratorio"
+							}
+						}
+					]
+				},
+				{
+					"name": "Users CRUD",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users"]
+								},
+								"description": "Obtiene todos los usuarios del sistema"
+							}
+						},
+						{
+							"name": "Get User by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "1"]
+								},
+								"description": "Obtiene un usuario específico por ID"
+							}
+						},
+						{
+							"name": "Get User by Email",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/email/admin@hospital.cl",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "email", "admin@hospital.cl"]
+								},
+								"description": "Obtiene un usuario por su email"
+							}
+						},
+						{
+							"name": "Create User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fullName\": \"Pedro Martínez\",\n  \"email\": \"pedro.martinez@hospital.cl\",\n  \"password\": \"pedro123\",\n  \"enabled\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/users",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users"]
+								},
+								"description": "Crea un nuevo usuario"
+							}
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fullName\": \"Pedro Martínez Updated\",\n  \"email\": \"pedro.martinez@hospital.cl\",\n  \"enabled\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/users/4",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "4"]
+								},
+								"description": "Actualiza un usuario existente"
+							}
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/4",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "4"]
+								},
+								"description": "Elimina un usuario"
+							}
+						},
+						{
+							"name": "Toggle User Enabled",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/2/toggle-enabled",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "2", "toggle-enabled"]
+								},
+								"description": "Habilita/deshabilita un usuario"
+							}
+						}
+					]
+				},
+				{
+					"name": "Roles Management",
+					"item": [
+						{
+							"name": "Assign Role to User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/2/roles/ADMIN",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "2", "roles", "ADMIN"]
+								},
+								"description": "Asigna un rol a un usuario (ADMIN, DOCTOR, LAB_TECH)"
+							}
+						},
+						{
+							"name": "Remove Role from User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/api/users/2/roles/ADMIN",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8081",
+									"path": ["api", "users", "2", "roles", "ADMIN"]
+								},
+								"description": "Remueve un rol de un usuario"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MS-LABORATORIOS (8082)",
+			"item": [
+				{
+					"name": "Laboratorios",
+					"item": [
+						{
+							"name": "Get All Laboratorios",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/laboratorios",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["laboratorios"]
+								},
+								"description": "Obtiene todos los laboratorios"
+							}
+						},
+						{
+							"name": "Get Laboratorio by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/laboratorios/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["laboratorios", "1"]
+								},
+								"description": "Obtiene un laboratorio específico por ID"
+							}
+						},
+						{
+							"name": "Create Laboratorio",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nombre\": \"Laboratorio Concepción\",\n  \"direccion\": \"Av. O'Higgins 456, Concepción\",\n  \"telefono\": \"+56941234567\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8082/laboratorios",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["laboratorios"]
+								},
+								"description": "Crea un nuevo laboratorio"
+							}
+						},
+						{
+							"name": "Update Laboratorio",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nombre\": \"Laboratorio Central Actualizado\",\n  \"direccion\": \"Av. Providencia 1234, Santiago\",\n  \"telefono\": \"+56912345678\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8082/laboratorios/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["laboratorios", "1"]
+								},
+								"description": "Actualiza un laboratorio existente"
+							}
+						},
+						{
+							"name": "Delete Laboratorio",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/laboratorios/4",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["laboratorios", "4"]
+								},
+								"description": "Elimina un laboratorio"
+							}
+						}
+					]
+				},
+				{
+					"name": "Asignaciones",
+					"item": [
+						{
+							"name": "Get All Asignaciones",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/asignaciones",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["asignaciones"]
+								},
+								"description": "Obtiene todas las asignaciones de pacientes a laboratorios"
+							}
+						},
+						{
+							"name": "Get Asignacion by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/asignaciones/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["asignaciones", "1"]
+								},
+								"description": "Obtiene una asignación específica por ID"
+							}
+						},
+						{
+							"name": "Create Asignacion",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"paciente\": \"Carlos González\",\n  \"fecha\": \"2025-11-25\",\n  \"laboratorioId\": 1\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8082/asignaciones",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["asignaciones"]
+								},
+								"description": "Crea una nueva asignación de paciente a laboratorio"
+							}
+						},
+						{
+							"name": "Update Asignacion",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"paciente\": \"Carlos González Actualizado\",\n  \"fecha\": \"2025-11-26\",\n  \"laboratorioId\": 2\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8082/asignaciones/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["asignaciones", "1"]
+								},
+								"description": "Actualiza una asignación existente"
+							}
+						},
+						{
+							"name": "Delete Asignacion",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/asignaciones/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8082",
+									"path": ["asignaciones", "1"]
+								},
+								"description": "Elimina una asignación"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MS-RESULTS (8083)",
+			"item": [
+				{
+					"name": "Tipos de Análisis",
+					"item": [
+						{
+							"name": "Get All Tipos de Análisis",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/tipos-analisis",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "tipos-analisis"]
+								},
+								"description": "Obtiene todos los tipos de análisis disponibles"
+							}
+						},
+						{
+							"name": "Get Tipo Análisis by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/tipos-analisis/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "tipos-analisis", "1"]
+								},
+								"description": "Obtiene un tipo de análisis por ID"
+							}
+						},
+						{
+							"name": "Create Tipo Análisis",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nombre\": \"PCR COVID-19\",\n  \"categoria\": \"Virología\",\n  \"unidadMedida\": null,\n  \"valorReferenciaMin\": null,\n  \"valorReferenciaMax\": null,\n  \"activo\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8083/api/tipos-analisis",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "tipos-analisis"]
+								},
+								"description": "Crea un nuevo tipo de análisis"
+							}
+						},
+						{
+							"name": "Update Tipo Análisis",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nombre\": \"Hemograma Completo Actualizado\",\n  \"categoria\": \"Hematología\",\n  \"unidadMedida\": \"células/μL\",\n  \"valorReferenciaMin\": 4000.00,\n  \"valorReferenciaMax\": 11000.00,\n  \"activo\": true\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8083/api/tipos-analisis/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "tipos-analisis", "1"]
+								},
+								"description": "Actualiza un tipo de análisis existente"
+							}
+						},
+						{
+							"name": "Delete Tipo Análisis",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/tipos-analisis/6",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "tipos-analisis", "6"]
+								},
+								"description": "Elimina un tipo de análisis"
+							}
+						}
+					]
+				},
+				{
+					"name": "Resultados",
+					"item": [
+						{
+							"name": "Get All Resultados",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/resultados",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados"]
+								},
+								"description": "Obtiene todos los resultados de análisis"
+							}
+						},
+						{
+							"name": "Get Resultado by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/resultados/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados", "1"]
+								},
+								"description": "Obtiene un resultado específico por ID"
+							}
+						},
+						{
+							"name": "Create Resultado - Numérico",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"paciente\": \"Ana Torres\",\n  \"fechaRealizacion\": \"2025-11-25T10:30:00\",\n  \"tipoAnalisisId\": 1,\n  \"laboratorioId\": 1,\n  \"valorNumerico\": 9500.00,\n  \"valorTexto\": null,\n  \"estado\": \"COMPLETADO\",\n  \"observaciones\": \"Valores normales\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8083/api/resultados",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados"]
+								},
+								"description": "Crea un resultado con valor numérico (ej: Hemograma)"
+							}
+						},
+						{
+							"name": "Create Resultado - Texto",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"paciente\": \"Luis Hernández\",\n  \"fechaRealizacion\": \"2025-11-25T11:00:00\",\n  \"tipoAnalisisId\": 5,\n  \"laboratorioId\": 2,\n  \"valorNumerico\": null,\n  \"valorTexto\": \"pH: 6.5, Densidad: 1.018, Proteínas: Negativo\",\n  \"estado\": \"PENDIENTE\",\n  \"observaciones\": \"Análisis en proceso\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8083/api/resultados",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados"]
+								},
+								"description": "Crea un resultado con valor texto (ej: Examen de Orina)"
+							}
+						},
+						{
+							"name": "Update Resultado",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"estado\": \"COMPLETADO\",\n  \"valorNumerico\": 9800.00,\n  \"observaciones\": \"Valores actualizados tras revisión\"\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8083/api/resultados/1",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados", "1"]
+								},
+								"description": "Actualiza un resultado existente (campos opcionales)"
+							}
+						},
+						{
+							"name": "Delete Resultado",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/resultados/4",
+									"protocol": "http",
+									"host": ["localhost"],
+									"port": "8083",
+									"path": ["api", "resultados", "4"]
+								},
+								"description": "Elimina un resultado"
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl_users",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl_labs",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl_results",
+			"value": "http://localhost:8083",
+			"type": "string"
+		}
+	]
+}

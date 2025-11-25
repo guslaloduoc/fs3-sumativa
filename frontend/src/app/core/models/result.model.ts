@@ -1,32 +1,45 @@
 export interface AnalysisType {
   id: number;
-  name: string;
-  description?: string;
+  nombre: string;
+  categoria: string;
+  unidadMedida?: string;
+  valorReferenciaMin?: number;
+  valorReferenciaMax?: number;
+  activo: boolean;
 }
 
 export interface Result {
   id: number;
-  patientName: string;
-  analysisTypeId: number;
-  analysisType?: AnalysisType;
-  laboratoryId: number;
-  resultValue: string;
-  resultDate: string;
-  createdAt: string;
+  paciente: string;
+  fechaRealizacion: string;
+  tipoAnalisis: AnalysisType;
+  laboratorioId: number;
+  valorNumerico?: number;
+  valorTexto?: string;
+  estado: string;
+  observaciones?: string;
+  creadoEn: string;
+  actualizadoEn: string;
 }
 
 export interface CreateResultRequest {
-  patientName: string;
-  analysisTypeId: number;
-  laboratoryId: number;
-  resultValue: string;
-  resultDate: string;
+  paciente: string;
+  fechaRealizacion: string;
+  tipoAnalisisId: number;
+  laboratorioId: number;
+  valorNumerico?: number;
+  valorTexto?: string;
+  estado: string;
+  observaciones?: string;
 }
 
 export interface UpdateResultRequest {
-  patientName?: string;
-  analysisTypeId?: number;
-  laboratoryId?: number;
-  resultValue?: string;
-  resultDate?: string;
+  paciente?: string;
+  fechaRealizacion?: string;
+  tipoAnalisisId?: number;
+  laboratorioId?: number;
+  valorNumerico?: number;
+  valorTexto?: string;
+  estado?: string;
+  observaciones?: string;
 }

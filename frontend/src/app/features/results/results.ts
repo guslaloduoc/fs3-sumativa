@@ -22,7 +22,12 @@ export class Results implements OnInit {
   results: Result[] = [];
   analysisTypes: AnalysisType[] = [];
   laboratories: Laboratory[] = [];
-  isLoading = false;
+
+  // Separate loading states
+  loadingResults = false;
+  loadingTypes = false;
+  loadingLabs = false;
+
   errorMessage = '';
   successMessage = '';
 
@@ -34,13 +39,21 @@ export class Results implements OnInit {
   showDeleteModal = false;
   resultToDelete: Result | null = null;
 
+  // Computed property for overall loading state
+  get isLoading(): boolean {
+    return this.loadingResults || this.loadingTypes || this.loadingLabs;
+  }
+
   constructor() {
     this.resultForm = this.fb.group({
-      patientName: ['', [Validators.required, Validators.minLength(3)]],
-      analysisTypeId: [null, [Validators.required]],
-      laboratoryId: [null, [Validators.required]],
-      resultValue: ['', [Validators.required]],
-      resultDate: ['', [Validators.required]]
+      paciente: ['', [Validators.required, Validators.minLength(3)]],
+      tipoAnalisisId: [null, [Validators.required]],
+      laboratorioId: [null, [Validators.required]],
+      valorNumerico: [null],
+      valorTexto: [''],
+      fechaRealizacion: ['', [Validators.required]],
+      estado: ['PENDIENTE', [Validators.required]],
+      observaciones: ['']
     });
   }
 
@@ -51,39 +64,54 @@ export class Results implements OnInit {
   }
 
   loadResults() {
-    this.isLoading = true;
+    this.loadingResults = true;
     this.errorMessage = '';
+    console.log('[Results] Iniciando carga de resultados...');
 
     this.resultService.getAll().subscribe({
       next: (results) => {
+        console.log('[Results] Resultados recibidos:', results.length);
         this.results = results;
-        this.isLoading = false;
+        this.loadingResults = false;
       },
       error: (error) => {
+        console.error('[Results] Error cargando resultados:', error);
         this.errorMessage = 'Error al cargar resultados: ' + (error.error?.error || error.message);
-        this.isLoading = false;
+        this.loadingResults = false;
       }
     });
   }
 
   loadAnalysisTypes() {
+    this.loadingTypes = true;
+    console.log('[Results] Iniciando carga de tipos de análisis...');
+
     this.resultService.getAllAnalysisTypes().subscribe({
       next: (types) => {
+        console.log('[Results] Tipos de análisis recibidos:', types.length);
         this.analysisTypes = types;
+        this.loadingTypes = false;
       },
       error: (error) => {
-        console.error('Error al cargar tipos de análisis:', error);
+        console.error('[Results] Error cargando tipos de análisis:', error);
+        this.loadingTypes = false;
       }
     });
   }
 
   loadLaboratories() {
+    this.loadingLabs = true;
+    console.log('[Results] Iniciando carga de laboratorios...');
+
     this.labService.getAll().subscribe({
       next: (labs) => {
+        console.log('[Results] Laboratorios recibidos:', labs.length);
         this.laboratories = labs;
+        this.loadingLabs = false;
       },
       error: (error) => {
-        console.error('Error al cargar laboratorios:', error);
+        console.error('[Results] Error cargando laboratorios:', error);
+        this.loadingLabs = false;
       }
     });
   }
@@ -97,22 +125,26 @@ export class Results implements OnInit {
     this.selectedResultId = null;
     this.resultForm.reset();
     // Set current date as default
-    const today = new Date().toISOString().split('T')[0];
-    this.resultForm.patchValue({ resultDate: today });
+    const today = new Date().toISOString();
+    this.resultForm.patchValue({
+      fechaRealizacion: today,
+      estado: 'PENDIENTE'
+    });
     this.showFormModal = true;
   }
 
   openEditModal(result: Result) {
     this.isEditMode = true;
     this.selectedResultId = result.id;
-    // Convert date string to YYYY-MM-DD format for input[type="date"]
-    const dateOnly = result.resultDate.split('T')[0];
     this.resultForm.patchValue({
-      patientName: result.patientName,
-      analysisTypeId: result.analysisTypeId,
-      laboratoryId: result.laboratoryId,
-      resultValue: result.resultValue,
-      resultDate: dateOnly
+      paciente: result.paciente,
+      tipoAnalisisId: result.tipoAnalisis.id,
+      laboratorioId: result.laboratorioId,
+      valorNumerico: result.valorNumerico,
+      valorTexto: result.valorTexto,
+      fechaRealizacion: result.fechaRealizacion,
+      estado: result.estado,
+      observaciones: result.observaciones
     });
     this.showFormModal = true;
   }
@@ -131,7 +163,7 @@ export class Results implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.loadingResults = true;
     this.errorMessage = '';
 
     const formData = this.resultForm.value;
@@ -147,7 +179,7 @@ export class Results implements OnInit {
         },
         error: (error) => {
           this.errorMessage = 'Error al actualizar: ' + (error.error?.error || error.message);
-          this.isLoading = false;
+          this.loadingResults = false;
         }
       });
     } else {
@@ -161,7 +193,7 @@ export class Results implements OnInit {
         },
         error: (error) => {
           this.errorMessage = 'Error al crear: ' + (error.error?.error || error.message);
-          this.isLoading = false;
+          this.loadingResults = false;
         }
       });
     }
@@ -195,11 +227,11 @@ export class Results implements OnInit {
   }
 
   getAnalysisTypeName(id: number): string {
-    return this.analysisTypes.find(t => t.id === id)?.name || 'N/A';
+    return this.analysisTypes.find(t => t.id === id)?.nombre || 'N/A';
   }
 
   getLaboratoryName(id: number): string {
-    return this.laboratories.find(l => l.id === id)?.name || 'N/A';
+    return this.laboratories.find(l => l.id === id)?.nombre || 'N/A';
   }
 
   formatDate(dateString: string): string {
@@ -207,9 +239,12 @@ export class Results implements OnInit {
     return date.toLocaleDateString('es-CL');
   }
 
-  get patientName() { return this.resultForm.get('patientName'); }
-  get analysisTypeId() { return this.resultForm.get('analysisTypeId'); }
-  get laboratoryId() { return this.resultForm.get('laboratoryId'); }
-  get resultValue() { return this.resultForm.get('resultValue'); }
-  get resultDate() { return this.resultForm.get('resultDate'); }
+  get paciente() { return this.resultForm.get('paciente'); }
+  get tipoAnalisisId() { return this.resultForm.get('tipoAnalisisId'); }
+  get laboratorioId() { return this.resultForm.get('laboratorioId'); }
+  get valorNumerico() { return this.resultForm.get('valorNumerico'); }
+  get valorTexto() { return this.resultForm.get('valorTexto'); }
+  get fechaRealizacion() { return this.resultForm.get('fechaRealizacion'); }
+  get estado() { return this.resultForm.get('estado'); }
+  get observaciones() { return this.resultForm.get('observaciones'); }
 }

@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { LaboratoryService } from '../../core/services/laboratory.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Laboratory, CreateLaboratoryRequest, UpdateLaboratoryRequest } from '../../core/models/laboratory.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-laboratories',
@@ -11,7 +12,7 @@ import { Laboratory, CreateLaboratoryRequest, UpdateLaboratoryRequest } from '..
   templateUrl: './laboratories.html',
   styleUrl: './laboratories.scss',
 })
-export class Laboratories implements OnInit {
+export class Laboratories implements OnInit, OnDestroy {
   private labService = inject(LaboratoryService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
@@ -29,11 +30,13 @@ export class Laboratories implements OnInit {
   showDeleteModal = false;
   labToDelete: Laboratory | null = null;
 
+  private loadSubscription?: Subscription;
+
   constructor() {
     this.labForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      location: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['']
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      direccion: ['', [Validators.required, Validators.minLength(3)]],
+      telefono: ['']
     });
   }
 
@@ -42,19 +45,36 @@ export class Laboratories implements OnInit {
   }
 
   loadLaboratories() {
+    // Si ya hay una petición en progreso, no hacer nada
+    if (this.isLoading) {
+      console.log('[Laboratories] Ya hay una carga en progreso, ignorando...');
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
+    console.log('[Laboratories] Iniciando carga de laboratorios...');
 
-    this.labService.getAll().subscribe({
+    this.loadSubscription = this.labService.getAll().subscribe({
       next: (labs) => {
+        console.log('[Laboratories] Datos recibidos:', labs);
+        console.log('[Laboratories] Cantidad:', labs.length);
         this.laboratories = labs;
         this.isLoading = false;
+        console.log('[Laboratories] isLoading = false, laboratories.length =', this.laboratories.length);
       },
       error: (error) => {
+        console.error('[Laboratories] ERROR:', error);
         this.errorMessage = 'Error al cargar laboratorios: ' + (error.error?.error || error.message);
         this.isLoading = false;
       }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.loadSubscription) {
+      this.loadSubscription.unsubscribe();
+    }
   }
 
   get canManage() {
@@ -72,9 +92,9 @@ export class Laboratories implements OnInit {
     this.isEditMode = true;
     this.selectedLabId = lab.id;
     this.labForm.patchValue({
-      name: lab.name,
-      location: lab.location,
-      description: lab.description || ''
+      nombre: lab.nombre,
+      direccion: lab.direccion,
+      telefono: lab.telefono || ''
     });
     this.showFormModal = true;
   }
@@ -156,7 +176,7 @@ export class Laboratories implements OnInit {
     });
   }
 
-  get name() { return this.labForm.get('name'); }
-  get location() { return this.labForm.get('location'); }
-  get description() { return this.labForm.get('description'); }
+  get nombre() { return this.labForm.get('nombre'); }
+  get direccion() { return this.labForm.get('direccion'); }
+  get telefono() { return this.labForm.get('telefono'); }
 }

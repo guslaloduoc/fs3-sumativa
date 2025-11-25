@@ -36,13 +36,13 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     environment:
-      - SPRING_PROFILES_ACTIVE=oracle
-      - DB_TNS_NAME=${DB_TNS_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - TNS_ADMIN_PATH=/app/wallet
-    volumes:
-      - ./Wallet_fs3:/app/wallet:ro
+      - SPRING_PROFILES_ACTIVE=dev
+      # - DB_TNS_NAME=${DB_TNS_NAME}
+      # - DB_USERNAME=${DB_USERNAME}
+      # - DB_PASSWORD=${DB_PASSWORD}
+      # - TNS_ADMIN_PATH=/app/wallet
+    # volumes:
+      # - ./Wallet_fs3:/app/wallet:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/users"]
@@ -65,13 +65,13 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     environment:
-      - SPRING_PROFILES_ACTIVE=oracle
-      - DB_TNS_NAME=${DB_TNS_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - TNS_ADMIN_PATH=/app/wallet
-    volumes:
-      - ./Wallet_fs3:/app/wallet:ro
+      - SPRING_PROFILES_ACTIVE=h2
+      # - DB_TNS_NAME=${DB_TNS_NAME}
+      # - DB_USERNAME=${DB_USERNAME}
+      # - DB_PASSWORD=${DB_PASSWORD}
+      # - TNS_ADMIN_PATH=/app/wallet
+    # volumes:
+      # - ./Wallet_fs3:/app/wallet:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/laboratorios"]
@@ -94,13 +94,13 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     environment:
-      - SPRING_PROFILES_ACTIVE=oracle
-      - DB_TNS_NAME=${DB_TNS_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - TNS_ADMIN_PATH=/app/wallet
-    volumes:
-      - ./Wallet_fs3:/app/wallet:ro
+      - SPRING_PROFILES_ACTIVE=h2
+      # - DB_TNS_NAME=${DB_TNS_NAME}
+      # - DB_USERNAME=${DB_USERNAME}
+      # - DB_PASSWORD=${DB_PASSWORD}
+      # - TNS_ADMIN_PATH=/app/wallet
+    # volumes:
+      # - ./Wallet_fs3:/app/wallet:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/api/resultados"]
