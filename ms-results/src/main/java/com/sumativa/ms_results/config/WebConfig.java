@@ -23,7 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:4200",  // Angular dev server
-                    "http://127.0.0.1:4200"   // Alternativa
+                    "http://127.0.0.1:4200",  // Alternativa
+                    "http://localhost:4101",  // Docker frontend
+                    "http://127.0.0.1:4101"   // Docker frontend alternativa
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")

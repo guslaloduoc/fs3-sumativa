@@ -39,7 +39,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
-          @if (isLoading && results.length === 0) {
+          @if (isLoading) {
             <div class="spinner-wrapper">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Cargando...</span>
@@ -78,21 +78,21 @@
                       <td><strong>#{{ result.id }}</strong></td>
                       <td>
                         <i class="bi bi-person me-2 text-muted"></i>
-                        {{ result.patientName }}
+                        {{ result.paciente }}
                       </td>
                       <td>
                         <span class="badge bg-info">
-                          {{ getAnalysisTypeName(result.analysisTypeId) }}
+                          {{ result.tipoAnalisis?.nombre || 'N/A' }}
                         </span>
                       </td>
                       <td>
                         <i class="bi bi-building me-2 text-muted"></i>
-                        {{ getLaboratoryName(result.laboratoryId) }}
+                        {{ getLaboratoryName(result.laboratorioId) }}
                       </td>
-                      <td>{{ result.resultValue }}</td>
+                      <td>{{ result.valorNumerico || result.valorTexto }}</td>
                       <td>
                         <i class="bi bi-calendar3 me-2 text-muted"></i>
-                        {{ formatDate(result.resultDate) }}
+                        {{ formatDate(result.fechaRealizacion) }}
                       </td>
                       @if (canManageResults) {
                         <td class="text-center">
@@ -141,24 +141,24 @@
             <div class="row">
               <!-- Patient Name -->
               <div class="col-12 col-md-6 mb-3">
-                <label for="patientName" class="form-label">
+                <label for="paciente" class="form-label">
                   <i class="bi bi-person me-1"></i>
                   Nombre del Paciente *
                 </label>
                 <input
                   type="text"
                   class="form-control"
-                  id="patientName"
-                  formControlName="patientName"
+                  id="paciente"
+                  formControlName="paciente"
                   placeholder="Ej: Juan Pérez"
-                  [class.is-invalid]="patientName?.invalid && patientName?.touched"
+                  [class.is-invalid]="paciente?.invalid && paciente?.touched"
                 >
-                @if (patientName?.invalid && patientName?.touched) {
+                @if (paciente?.invalid && paciente?.touched) {
                   <div class="invalid-feedback">
-                    @if (patientName?.errors?.['required']) {
+                    @if (paciente?.errors?.['required']) {
                       El nombre del paciente es requerido
                     }
-                    @if (patientName?.errors?.['minlength']) {
+                    @if (paciente?.errors?.['minlength']) {
                       Mínimo 3 caracteres
                     }
                   </div>
@@ -167,22 +167,22 @@
 
               <!-- Analysis Type -->
               <div class="col-12 col-md-6 mb-3">
-                <label for="analysisTypeId" class="form-label">
+                <label for="tipoAnalisisId" class="form-label">
                   <i class="bi bi-clipboard2-pulse me-1"></i>
                   Tipo de Análisis *
                 </label>
                 <select
                   class="form-select"
-                  id="analysisTypeId"
-                  formControlName="analysisTypeId"
-                  [class.is-invalid]="analysisTypeId?.invalid && analysisTypeId?.touched"
+                  id="tipoAnalisisId"
+                  formControlName="tipoAnalisisId"
+                  [class.is-invalid]="tipoAnalisisId?.invalid && tipoAnalisisId?.touched"
                 >
                   <option [ngValue]="null">Seleccione un tipo</option>
                   @for (type of analysisTypes; track type.id) {
-                    <option [ngValue]="type.id">{{ type.name }}</option>
+                    <option [ngValue]="type.id">{{ type.nombre }}</option>
                   }
                 </select>
-                @if (analysisTypeId?.invalid && analysisTypeId?.touched) {
+                @if (tipoAnalisisId?.invalid && tipoAnalisisId?.touched) {
                   <div class="invalid-feedback">
                     Debe seleccionar un tipo de análisis
                   </div>
@@ -191,22 +191,22 @@
 
               <!-- Laboratory -->
               <div class="col-12 col-md-6 mb-3">
-                <label for="laboratoryId" class="form-label">
+                <label for="laboratorioId" class="form-label">
                   <i class="bi bi-building me-1"></i>
                   Laboratorio *
                 </label>
                 <select
                   class="form-select"
-                  id="laboratoryId"
-                  formControlName="laboratoryId"
-                  [class.is-invalid]="laboratoryId?.invalid && laboratoryId?.touched"
+                  id="laboratorioId"
+                  formControlName="laboratorioId"
+                  [class.is-invalid]="laboratorioId?.invalid && laboratorioId?.touched"
                 >
                   <option [ngValue]="null">Seleccione un laboratorio</option>
                   @for (lab of laboratories; track lab.id) {
-                    <option [ngValue]="lab.id">{{ lab.name }} - {{ lab.location }}</option>
+                    <option [ngValue]="lab.id">{{ lab.nombre }} - {{ lab.direccion }}</option>
                   }
                 </select>
-                @if (laboratoryId?.invalid && laboratoryId?.touched) {
+                @if (laboratorioId?.invalid && laboratorioId?.touched) {
                   <div class="invalid-feedback">
                     Debe seleccionar un laboratorio
                   </div>
@@ -215,43 +215,91 @@
 
               <!-- Result Date -->
               <div class="col-12 col-md-6 mb-3">
-                <label for="resultDate" class="form-label">
+                <label for="fechaRealizacion" class="form-label">
                   <i class="bi bi-calendar3 me-1"></i>
                   Fecha del Resultado *
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   class="form-control"
-                  id="resultDate"
-                  formControlName="resultDate"
-                  [class.is-invalid]="resultDate?.invalid && resultDate?.touched"
+                  id="fechaRealizacion"
+                  formControlName="fechaRealizacion"
+                  [class.is-invalid]="fechaRealizacion?.invalid && fechaRealizacion?.touched"
                 >
-                @if (resultDate?.invalid && resultDate?.touched) {
+                @if (fechaRealizacion?.invalid && fechaRealizacion?.touched) {
                   <div class="invalid-feedback">
                     La fecha es requerida
                   </div>
                 }
               </div>
 
-              <!-- Result Value -->
-              <div class="col-12 mb-3">
-                <label for="resultValue" class="form-label">
+              <!-- Numeric Value -->
+              <div class="col-12 col-md-6 mb-3">
+                <label for="valorNumerico" class="form-label">
+                  <i class="bi bi-123 me-1"></i>
+                  Valor Numérico
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="valorNumerico"
+                  formControlName="valorNumerico"
+                  placeholder="Ej: 14.5"
+                  step="0.01"
+                >
+              </div>
+
+              <!-- Text Value -->
+              <div class="col-12 col-md-6 mb-3">
+                <label for="valorTexto" class="form-label">
                   <i class="bi bi-file-text me-1"></i>
-                  Valor/Descripción del Resultado *
+                  Valor Texto
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="valorTexto"
+                  formControlName="valorTexto"
+                  placeholder="Ej: Normal, Positivo, etc."
+                >
+              </div>
+
+              <!-- Estado -->
+              <div class="col-12 col-md-6 mb-3">
+                <label for="estado" class="form-label">
+                  <i class="bi bi-flag me-1"></i>
+                  Estado *
+                </label>
+                <select
+                  class="form-select"
+                  id="estado"
+                  formControlName="estado"
+                  [class.is-invalid]="estado?.invalid && estado?.touched"
+                >
+                  <option value="PENDIENTE">Pendiente</option>
+                  <option value="COMPLETADO">Completado</option>
+                  <option value="REVISADO">Revisado</option>
+                </select>
+                @if (estado?.invalid && estado?.touched) {
+                  <div class="invalid-feedback">
+                    El estado es requerido
+                  </div>
+                }
+              </div>
+
+              <!-- Observations -->
+              <div class="col-12 mb-3">
+                <label for="observaciones" class="form-label">
+                  <i class="bi bi-chat-left-text me-1"></i>
+                  Observaciones
                 </label>
                 <textarea
                   class="form-control"
-                  id="resultValue"
-                  formControlName="resultValue"
-                  rows="4"
-                  placeholder="Ej: Hemoglobina: 14.5 g/dL (Normal)&#10;Leucocitos: 7500/mm³ (Normal)"
-                  [class.is-invalid]="resultValue?.invalid && resultValue?.touched"
+                  id="observaciones"
+                  formControlName="observaciones"
+                  rows="3"
+                  placeholder="Observaciones adicionales sobre el resultado..."
                 ></textarea>
-                @if (resultValue?.invalid && resultValue?.touched) {
-                  <div class="invalid-feedback">
-                    El resultado es requerido
-                  </div>
-                }
               </div>
             </div>
           </form>
@@ -297,9 +345,9 @@
           <p>¿Estás seguro que deseas eliminar este resultado?</p>
           <div class="card bg-light">
             <div class="card-body">
-              <p class="mb-1"><strong>Paciente:</strong> {{ resultToDelete.patientName }}</p>
-              <p class="mb-1"><strong>Análisis:</strong> {{ getAnalysisTypeName(resultToDelete.analysisTypeId) }}</p>
-              <p class="mb-0"><strong>Fecha:</strong> {{ formatDate(resultToDelete.resultDate) }}</p>
+              <p class="mb-1"><strong>Paciente:</strong> {{ resultToDelete.paciente }}</p>
+              <p class="mb-1"><strong>Análisis:</strong> {{ resultToDelete.tipoAnalisis?.nombre || 'N/A' }}</p>
+              <p class="mb-0"><strong>Fecha:</strong> {{ formatDate(resultToDelete.fechaRealizacion) }}</p>
             </div>
           </div>
           <p class="text-danger mt-3 mb-0">

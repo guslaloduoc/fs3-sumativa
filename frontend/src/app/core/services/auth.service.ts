@@ -47,7 +47,7 @@ export class AuthService {
 
   private loadUserFromStorage(): void {
     const userJson = localStorage.getItem('currentUser');
-    if (userJson) {
+    if (userJson && userJson !== 'undefined' && userJson !== 'null') {
       try {
         const user = JSON.parse(userJson);
         this.currentUserSignal.set(user);
@@ -55,6 +55,9 @@ export class AuthService {
         console.error('Error loading user from storage', error);
         localStorage.removeItem('currentUser');
       }
+    } else {
+      // Limpiar valores inválidos del localStorage
+      localStorage.removeItem('currentUser');
     }
   }
 }

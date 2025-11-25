@@ -1,19 +1,18 @@
 export interface Laboratory {
   id: number;
-  name: string;
-  location: string;
-  description?: string;
-  createdAt: string;
+  nombre: string;
+  direccion: string;
+  telefono?: string;
 }
 
 export interface CreateLaboratoryRequest {
-  name: string;
-  location: string;
-  description?: string;
+  nombre: string;
+  direccion: string;
+  telefono?: string;
 }
 
 export interface UpdateLaboratoryRequest {
-  name?: string;
-  location?: string;
-  description?: string;
+  nombre?: string;
+  direccion?: string;
+  telefono?: string;
 }
