@@ -1,0 +1,234 @@
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <!-- Header -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <div class="profile-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+            </div>
+            <div class="col">
+              <h3 class="mb-1">{{ currentUser?.fullName }}</h3>
+              <p class="text-muted mb-2">{{ currentUser?.email }}</p>
+              @if (currentUser && currentUser.roles && currentUser.roles.length > 0) {
+                <div>
+                  @for (role of currentUser.roles; track role.id) {
+                    <span class="badge bg-primary me-1">{{ role.name }}</span>
+                  }
+                </div>
+              }
+            </div>
+            <div class="col-auto">
+              @if (currentUser?.enabled) {
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i>Activo
+                </span>
+              } @else {
+                <span class="badge bg-danger">
+                  <i class="bi bi-x-circle me-1"></i>Inactivo
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      @if (successMessage) {
+        <div class="alert alert-success alert-dismissible fade show">
+          <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+          <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="alert alert-danger alert-dismissible fade show">
+          <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+        </div>
+      }
+
+      <!-- Edit Profile Form -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="bi bi-person-gear me-2"></i>
+            Editar Perfil
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <!-- Full Name -->
+            <div class="mb-4">
+              <label for="fullName" class="form-label fw-bold">
+                <i class="bi bi-person me-1"></i>
+                Nombre Completo
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="fullName"
+                formControlName="fullName"
+                placeholder="Ingresa tu nombre completo"
+                [class.is-invalid]="fullName?.invalid && fullName?.touched">
+              @if (fullName?.invalid && fullName?.touched) {
+                <div class="invalid-feedback">
+                  @if (fullName?.errors?.['required']) {
+                    El nombre completo es requerido
+                  }
+                  @if (fullName?.errors?.['minlength']) {
+                    El nombre debe tener al menos 3 caracteres
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+              <label for="email" class="form-label fw-bold">
+                <i class="bi bi-envelope me-1"></i>
+                Correo Electrónico
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                formControlName="email"
+                placeholder="tu@email.com"
+                [class.is-invalid]="email?.invalid && email?.touched">
+              @if (email?.invalid && email?.touched) {
+                <div class="invalid-feedback">
+                  @if (email?.errors?.['required']) {
+                    El correo electrónico es requerido
+                  }
+                  @if (email?.errors?.['email']) {
+                    Ingresa un correo electrónico válido
+                  }
+                </div>
+              }
+            </div>
+
+            <hr class="my-4">
+
+            <h6 class="mb-3">
+              <i class="bi bi-shield-lock me-1"></i>
+              Cambiar Contraseña (opcional)
+            </h6>
+            <p class="text-muted small mb-3">
+              Deja los campos vacíos si no deseas cambiar tu contraseña
+            </p>
+
+            <!-- New Password -->
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">
+                <i class="bi bi-lock me-1"></i>
+                Nueva Contraseña
+              </label>
+              <div class="input-group">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  class="form-control"
+                  id="newPassword"
+                  formControlName="newPassword"
+                  placeholder="••••••••"
+                  [class.is-invalid]="newPassword?.invalid && newPassword?.touched">
+                <button class="btn btn-outline-secondary" type="button" (click)="showPassword = !showPassword">
+                  <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              @if (newPassword?.invalid && newPassword?.touched) {
+                <div class="text-danger small mt-1">
+                  @if (newPassword?.errors?.['minlength']) {
+                    La contraseña debe tener al menos 6 caracteres
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label">
+                <i class="bi bi-lock-fill me-1"></i>
+                Confirmar Nueva Contraseña
+              </label>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-control"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                [class.is-invalid]="(confirmPassword?.invalid && confirmPassword?.touched) || passwordMismatch">
+              @if (passwordMismatch && confirmPassword?.touched) {
+                <div class="text-danger small mt-1">
+                  Las contraseñas no coinciden
+                </div>
+              }
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-secondary" (click)="resetForm()">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="isLoading || profileForm.invalid">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                <i class="bi bi-save me-1"></i>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Account Info -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Información de la Cuenta
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <p class="mb-1 text-muted small">ID de Usuario</p>
+              <p class="mb-0 fw-bold">{{ currentUser?.id }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="mb-1 text-muted small">Fecha de Creación</p>
+              <p class="mb-0 fw-bold">{{ currentUser?.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="mb-1 text-muted small">Estado de la Cuenta</p>
+              <p class="mb-0">
+                @if (currentUser?.enabled) {
+                  <span class="badge bg-success">Activa</span>
+                } @else {
+                  <span class="badge bg-danger">Inactiva</span>
+                }
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <p class="mb-1 text-muted small">Roles Asignados</p>
+              <p class="mb-0">
+                @if (currentUser && currentUser.roles && currentUser.roles.length > 0) {
+                  @for (role of currentUser.roles; track role.id) {
+                    <span class="badge bg-secondary me-1">{{ role.name }}</span>
+                  }
+                } @else {
+                  <span class="text-muted">Sin roles</span>
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

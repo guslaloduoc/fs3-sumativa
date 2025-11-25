@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Controlador REST para gestión de laboratorios
  */
 @RestController
-@RequestMapping("/laboratorios")
+@RequestMapping("/api/laboratorios")
 @RequiredArgsConstructor
 public class LaboratorioController {
 

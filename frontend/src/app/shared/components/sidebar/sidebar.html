@@ -1,0 +1,48 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <button class="btn btn-link toggle-btn" (click)="toggleSidebar()">
+      <i [class]="isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left'"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+          <i class="bi bi-speedometer2"></i>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/laboratories" routerLinkActive="active">
+          <i class="bi bi-building"></i>
+          <span class="nav-text">Laboratorios</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/results" routerLinkActive="active">
+          <i class="bi bi-file-medical"></i>
+          <span class="nav-text">Resultados</span>
+        </a>
+      </li>
+
+      @if (authService.hasRole('ADMIN')) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/users" routerLinkActive="active">
+            <i class="bi bi-people"></i>
+            <span class="nav-text">Usuarios</span>
+          </a>
+        </li>
+      }
+
+      <li class="nav-item mt-auto">
+        <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+          <i class="bi bi-person-gear"></i>
+          <span class="nav-text">Mi Perfil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>

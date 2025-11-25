@@ -1,0 +1,116 @@
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.table {
+  th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #666;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f8f9fa !important;
+    }
+  }
+}
+
+.btn-group-sm {
+  .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+.modal {
+  &.show {
+    display: block;
+    animation: fadeIn 0.3s;
+  }
+
+  .modal-dialog {
+    animation: slideDown 0.3s;
+  }
+
+  .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom: 1px solid #dee2e6;
+
+    &.bg-danger {
+      border-bottom: none;
+    }
+  }
+
+  .modal-footer {
+    border-top: 1px solid #dee2e6;
+  }
+}
+
+.form-check-input {
+  &:checked {
+    background-color: #0066cc;
+    border-color: #0066cc;
+  }
+
+  &:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+  }
+}
+
+.badge {
+  padding: 0.35em 0.65em;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-group-sm {
+    flex-direction: column;
+
+    .btn {
+      border-radius: 0.25rem !important;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .table {
+    font-size: 0.875rem;
+  }
+}

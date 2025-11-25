@@ -37,8 +37,18 @@ logs/
 .DS_Store
 Thumbs.db
 
+# H2 Database files (runtime data - should not be versioned)
+**/data/
+*.mv.db
+*.trace.db
+
 # Temporary files
 *.tmp
 *.bak
 *.swp
 *~
+# Environment variables
+.env
+
+# Docker
+docker-compose.override.yml

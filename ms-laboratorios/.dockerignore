@@ -1,0 +1,46 @@
+# Build artifacts (no necesarios, Docker compila desde cero)
+target/
+*.jar
+*.war
+*.ear
+
+# Maven wrapper jar (se descarga automáticamente)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files (innecesarios en contenedor)
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+*.iml
+*.iws
+*.ipr
+
+# Git (innecesario en imagen)
+.git/
+.gitignore
+.gitattributes
+
+# Logs locales
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Test reports
+test-output/
+coverage/
+
+# Documentation
+*.md
+docs/
