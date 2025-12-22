@@ -78,10 +78,10 @@ export class Register {
 
     const { fullName, email, password } = this.registerForm.value;
 
-    this.userService.create({
+    this.userService.register({
       fullName,
       email,
-      passwordHash: password,
+      password,
       enabled: true
     }).subscribe({
       next: () => {

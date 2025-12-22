@@ -7,8 +7,8 @@ import { Result, CreateResultRequest, UpdateResultRequest, AnalysisType } from '
 describe('ResultService', () => {
   let service: ResultService;
   let httpMock: HttpTestingController;
-  const API_URL = 'http://localhost:8083/api/resultados';
-  const ANALYSIS_TYPES_URL = 'http://localhost:8083/api/tipos-analisis';
+  const API_URL = 'http://localhost:8080/api/resultados';
+  const ANALYSIS_TYPES_URL = 'http://localhost:8080/api/tipos-analisis';
 
   const mockAnalysisType: AnalysisType = {
     id: 1,
@@ -487,11 +487,11 @@ describe('ResultService', () => {
 
   describe('API_URL configuration', () => {
     it('should use correct results API endpoint', () => {
-      expect(service['API_URL']).toBe('http://localhost:8083/api/resultados');
+      expect(service['API_URL']).toBe('http://localhost:8080/api/resultados');
     });
 
     it('should use correct analysis types API endpoint', () => {
-      expect(service['ANALYSIS_TYPES_URL']).toBe('http://localhost:8083/api/tipos-analisis');
+      expect(service['ANALYSIS_TYPES_URL']).toBe('http://localhost:8080/api/tipos-analisis');
     });
   });
 });

@@ -150,12 +150,46 @@ MS-Results (8083):
 - PUT /api/resultados/{id}
 - DELETE /api/resultados/{id}
 
+## Arquetipo Maven
+
+El proyecto incluye un **arquetipo Maven** que permite generar nuevos microservicios Spring Boot con la misma estructura y configuración.
+
+### ✅ Evidencia de Uso del Arquetipo
+
+**Ver documento oficial**: `EVIDENCIA_USO_ARQUETIPO.md`
+
+El arquetipo ha sido:
+- ✅ Creado a partir de ms-users
+- ✅ Instalado en repositorio local Maven
+- ✅ Documentado completamente
+- ✅ Probado generando `ms-demo-archetype`
+
+### Generar Nuevo Microservicio
+
+```cmd
+cd sumativa
+mvn archetype:generate ^
+  -DarchetypeGroupId=com.sumativa ^
+  -DarchetypeArtifactId=ms-usuarios-archetype ^
+  -DarchetypeVersion=0.0.1-SNAPSHOT ^
+  -DgroupId=com.sumativa ^
+  -DartifactId=ms-nuevo-servicio ^
+  -Dversion=0.0.1-SNAPSHOT ^
+  -Dpackage=com.sumativa.ms_nuevo_servicio
+```
+
+**Documentación completa**:
+- `springboot-microservice-archetype/README.md` - Manual completo
+- `springboot-microservice-archetype/GUIA_RAPIDA.md` - Guía rápida
+- `EVIDENCIA_USO_ARQUETIPO.md` - Evidencia oficial
+
 ## Tecnologias
 
 Backend: Java 21, Spring Boot 3.3.4, Oracle JDBC, Flyway
 Frontend: Angular 21, TypeScript, Bootstrap 5
 Base de Datos: Oracle Cloud ATP
 Contenedores: Docker, Docker Compose, Nginx
+Arquetipo: Maven Archetype para generación de microservicios
 
 ## Arquitectura Docker
 
@@ -204,6 +238,68 @@ sumativa/
     ├── Dockerfile
     └── .dockerignore
 ```
+
+## Analisis de Calidad con SonarQube
+
+### Requisitos Previos
+
+1. **SonarQube corriendo** (incluido en docker-compose):
+   - URL: http://localhost:9000
+   - Usuario inicial: `admin` / `admin`
+
+2. **Token de SonarQube** (crear una sola vez):
+   - Ir a http://localhost:9000
+   - My Account > Security > Generate Token
+   - Guardar el token en `sonar-token.txt`
+
+### Ejecutar Analisis Completo
+
+```powershell
+.\run-sonar-analysis.cmd
+```
+
+### Que hace el script `run-sonar-analysis.cmd`
+
+El script ejecuta tests y analisis de SonarQube para cada componente:
+
+| Paso | Componente      | Comandos Ejecutados                                           |
+|------|-----------------|---------------------------------------------------------------|
+| 1/4  | Frontend        | `npm install` + `npm run test:headless` + `npm run sonar`     |
+| 2/4  | ms-users        | `mvnw clean test jacoco:report` + `mvnw sonar:sonar`          |
+| 3/4  | ms-laboratorios | `mvnw clean test jacoco:report` + `mvnw sonar:sonar`          |
+| 4/4  | ms-results      | `mvnw clean test jacoco:report` + `mvnw sonar:sonar`          |
+
+### Ejecutar Tests Manualmente
+
+**Frontend (Angular con Karma/Jasmine):**
+```bash
+cd frontend
+npm run test              # Tests con browser
+npm run test:headless     # Tests sin browser (CI/CD)
+```
+
+**Microservicios (JUnit 5 + JaCoCo):**
+```bash
+cd ms-users               # o ms-laboratorios, ms-results
+.\mvnw.cmd test                           # Solo tests
+.\mvnw.cmd clean test jacoco:report       # Tests + reporte cobertura
+```
+
+### Ver Resultados
+
+| Recurso                | URL / Ubicacion                                    |
+|------------------------|----------------------------------------------------|
+| SonarQube Dashboard    | http://localhost:9000                              |
+| Reporte JaCoCo         | `{microservicio}/target/site/jacoco/index.html`    |
+| Reporte Karma          | `frontend/coverage/index.html`                     |
+
+### Metricas Evaluadas por SonarQube
+
+- **Bugs**: Errores potenciales en el codigo
+- **Vulnerabilities**: Problemas de seguridad
+- **Code Smells**: Codigo que puede mejorarse
+- **Coverage**: Porcentaje de codigo cubierto por tests
+- **Duplications**: Codigo duplicado
 
 ## Proyecto
 

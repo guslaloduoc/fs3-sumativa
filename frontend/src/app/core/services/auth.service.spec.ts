@@ -8,7 +8,7 @@ import { User } from '../models/user.model';
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  const API_URL = 'http://localhost:8081/api/users';
+  const API_URL = 'http://localhost:8080/api/users';
 
   const mockUser: User = {
     id: 1,
@@ -51,7 +51,14 @@ describe('AuthService', () => {
       };
 
       const mockResponse: LoginResponse = {
-        user: mockUser,
+        id: mockUser.id,
+        fullName: mockUser.fullName,
+        email: mockUser.email,
+        enabled: mockUser.enabled,
+        roles: mockUser.roles,
+        createdAt: mockUser.createdAt,
+        token: 'mock-jwt-token',
+        tokenType: 'Bearer',
         message: 'Login successful'
       };
 
@@ -95,8 +102,9 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('should clear current user and localStorage', () => {
-      // Setup: set a user first
+      // Setup: set a user and token first
       localStorage.setItem('currentUser', JSON.stringify(mockUser));
+      localStorage.setItem('auth_token', 'mock-jwt-token');
       service['currentUserSignal'].set(mockUser);
 
       expect(service.isAuthenticated()).toBe(true);
@@ -120,13 +128,20 @@ describe('AuthService', () => {
   });
 
   describe('isAuthenticated', () => {
-    it('should return true when user is logged in', () => {
+    it('should return true when user and token are present', () => {
       service['currentUserSignal'].set(mockUser);
+      localStorage.setItem('auth_token', 'mock-jwt-token');
       expect(service.isAuthenticated()).toBe(true);
     });
 
     it('should return false when user is not logged in', () => {
       service['currentUserSignal'].set(null);
+      expect(service.isAuthenticated()).toBe(false);
+    });
+
+    it('should return false when token is missing', () => {
+      service['currentUserSignal'].set(mockUser);
+      localStorage.removeItem('auth_token');
       expect(service.isAuthenticated()).toBe(false);
     });
   });
@@ -177,6 +192,7 @@ describe('AuthService', () => {
   describe('loadUserFromStorage', () => {
     it('should load user from localStorage on service initialization', () => {
       localStorage.setItem('currentUser', JSON.stringify(mockUser));
+      localStorage.setItem('auth_token', 'mock-jwt-token');
 
       // Create new service instance to trigger constructor
       const newService = new AuthService(TestBed.inject(HttpTestingController) as any);
@@ -227,6 +243,7 @@ describe('AuthService', () => {
 
   describe('setCurrentUser', () => {
     it('should set user and save to localStorage', () => {
+      localStorage.setItem('auth_token', 'mock-jwt-token');
       service['setCurrentUser'](mockUser);
 
       expect(service.currentUser()).toEqual(mockUser);
@@ -252,7 +269,14 @@ describe('AuthService', () => {
       };
 
       const mockResponse: LoginResponse = {
-        user: mockUser,
+        id: mockUser.id,
+        fullName: mockUser.fullName,
+        email: mockUser.email,
+        enabled: mockUser.enabled,
+        roles: mockUser.roles,
+        createdAt: mockUser.createdAt,
+        token: 'mock-jwt-token',
+        tokenType: 'Bearer',
         message: 'Success'
       };
 

@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Result, CreateResultRequest, UpdateResultRequest, AnalysisType } from '../models/result.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultService {
-  private readonly API_URL = 'http://localhost:8083/api/resultados';
-  private readonly ANALYSIS_TYPES_URL = 'http://localhost:8083/api/tipos-analisis';
+  private readonly API_URL = environment.apiUrls.resultados;
+  private readonly ANALYSIS_TYPES_URL = environment.apiUrls.tiposAnalisis;
 
   constructor(private http: HttpClient) {}
 

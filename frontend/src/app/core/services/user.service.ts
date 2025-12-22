@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User, CreateUserRequest, UpdateUserRequest } from '../models/user.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = 'http://localhost:8081/api/users';
+  private readonly API_URL = environment.apiUrls.users;
 
   constructor(private http: HttpClient) {}
 
@@ -25,6 +26,10 @@ export class UserService {
 
   create(user: CreateUserRequest): Observable<User> {
     return this.http.post<User>(this.API_URL, user);
+  }
+
+  register(user: CreateUserRequest): Observable<User> {
+    return this.http.post<User>(`${this.API_URL}/register`, user);
   }
 
   update(id: number, user: UpdateUserRequest): Observable<User> {

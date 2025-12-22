@@ -7,7 +7,7 @@ import { User, CreateUserRequest, UpdateUserRequest } from '../models/user.model
 describe('UserService', () => {
   let service: UserService;
   let httpMock: HttpTestingController;
-  const API_URL = 'http://localhost:8081/api/users';
+  const API_URL = 'http://localhost:8080/api/users';
 
   const mockUser: User = {
     id: 1,
@@ -161,7 +161,7 @@ describe('UserService', () => {
       const newUser: CreateUserRequest = {
         fullName: 'New User',
         email: 'new@example.com',
-        passwordHash: 'password123',
+        password: 'password123',
         enabled: true
       };
 
@@ -193,7 +193,7 @@ describe('UserService', () => {
       const invalidUser: CreateUserRequest = {
         fullName: '',
         email: 'invalid-email',
-        passwordHash: '123'
+        password: '123'
       };
 
       service.create(invalidUser).subscribe({
@@ -494,7 +494,7 @@ describe('UserService', () => {
 
   describe('API_URL configuration', () => {
     it('should use correct API endpoint', () => {
-      expect(service['API_URL']).toBe('http://localhost:8081/api/users');
+      expect(service['API_URL']).toBe('http://localhost:8080/api/users');
     });
   });
 });

@@ -14,14 +14,14 @@ describe('Login', () => {
   let navigateSpy: jasmine.Spy;
 
   const mockLoginResponse: LoginResponse = {
-    user: {
-      id: 1,
-      fullName: 'Test User',
-      email: 'test@example.com',
-      enabled: true,
-      roles: [{ id: 1, name: 'ADMIN' }],
-      createdAt: '2024-01-01T00:00:00'
-    },
+    id: 1,
+    fullName: 'Test User',
+    email: 'test@example.com',
+    enabled: true,
+    roles: [{ id: 1, name: 'ADMIN' }],
+    createdAt: '2024-01-01T00:00:00',
+    token: 'mock-jwt-token',
+    tokenType: 'Bearer',
     message: 'Login successful'
   };
 

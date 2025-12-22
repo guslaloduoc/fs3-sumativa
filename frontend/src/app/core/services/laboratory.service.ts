@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Laboratory, CreateLaboratoryRequest, UpdateLaboratoryRequest } from '../models/laboratory.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LaboratoryService {
-  private readonly API_URL = 'http://localhost:8082/api/laboratorios';
+  private readonly API_URL = environment.apiUrls.laboratorios;
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: h2  # Profile por defecto: h2 (desarrollo), cambiar a 'oracle' para producción
+
+  application:
+    name: ms-usuarios
+
+  jpa:
+    hibernate:
+      # validate: no modifica el schema, solo valida que coincida con las entidades
+      # Flyway se encarga de las migraciones
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    # Evita lazy loading fuera de transacción
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+
+logging:
+  level:
+    com.sumativa.ms_usuarios: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

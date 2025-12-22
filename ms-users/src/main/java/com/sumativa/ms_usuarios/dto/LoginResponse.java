@@ -22,16 +22,20 @@ public class LoginResponse {
     private Boolean enabled;
     private LocalDateTime createdAt;
     private Set<RoleResponseDto> roles;
+    private String token;  // Token JWT
+    private String tokenType = "Bearer";
     private String message;
 
     public LoginResponse(Long id, String fullName, String email, Boolean enabled,
-                         LocalDateTime createdAt, Set<RoleResponseDto> roles) {
+                         LocalDateTime createdAt, Set<RoleResponseDto> roles, String token) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.enabled = enabled;
         this.createdAt = createdAt;
         this.roles = roles;
+        this.token = token;
+        this.tokenType = "Bearer";
         this.message = "Inicio de sesión exitoso";
     }
 }

@@ -13,13 +13,13 @@ export interface User {
 export interface CreateUserRequest {
   fullName: string;
   email: string;
-  passwordHash: string;
+  password: string;
   enabled?: boolean;
 }
 
 export interface UpdateUserRequest {
   fullName?: string;
   email?: string;
-  passwordHash?: string;
+  password?: string;
   enabled?: boolean;
 }

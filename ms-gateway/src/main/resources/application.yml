@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ms-gateway
+
+  cloud:
+    gateway:
+      # Rutas para los microservicios
+      routes:
+        # Microservicio de Usuarios (ms-users)
+        - id: ms-users
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /api/users/${segment}
+
+        # Microservicio de Laboratorios (ms-laboratorios)
+        - id: ms-laboratorios
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/laboratorios/**
+          filters:
+            - RewritePath=/api/laboratorios/(?<segment>.*), /api/laboratorios/${segment}
+
+        # Microservicio de Laboratorios (ms-laboratorios) - Asignaciones
+        - id: ms-laboratorios-asignaciones
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/asignaciones/**
+          filters:
+            - RewritePath=/api/asignaciones/(?<segment>.*), /api/asignaciones/${segment}
+
+        # Microservicio de Resultados (ms-results) - Resultados
+        - id: ms-results-resultados
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/resultados/**
+          filters:
+            - RewritePath=/api/resultados/(?<segment>.*), /api/resultados/${segment}
+
+        # Microservicio de Resultados (ms-results) - Tipos de Análisis
+        - id: ms-results-tipos-analisis
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/tipos-analisis/**
+          filters:
+            - RewritePath=/api/tipos-analisis/(?<segment>.*), /api/tipos-analisis/${segment}
+
+      # CORS manejado por CorsConfig.java
+
+# JWT Configuration (debe coincidir con la de los microservicios)
+jwt:
+  secret: ${JWT_SECRET:LabControlSecretKeyForJWTTokenGeneration2025MustBeLongEnoughForHS512Algorithm}
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.sumativa.ms_gateway: DEBUG

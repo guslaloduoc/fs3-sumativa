@@ -351,7 +351,7 @@ describe('Users', () => {
       component.saveUser();
 
       expect(userServiceSpy.update).toHaveBeenCalledWith(1, jasmine.objectContaining({
-        passwordHash: 'newpassword123'
+        password: 'newpassword123'
       }));
 
       tick();

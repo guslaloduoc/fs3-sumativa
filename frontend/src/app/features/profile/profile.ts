@@ -91,7 +91,7 @@ export class Profile implements OnInit {
         this.errorMessage = 'Las contraseñas no coinciden';
         return;
       }
-      updateData.passwordHash = this.profileForm.value.newPassword;
+      updateData.password = this.profileForm.value.newPassword;
     }
 
     this.userService.update(this.currentUser.id, updateData).subscribe({
