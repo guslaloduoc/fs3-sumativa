@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * Controlador REST para gestión de asignaciones
  */
 @RestController
-@RequestMapping("/asignaciones")
+@RequestMapping("/api/asignaciones")
 @RequiredArgsConstructor
 public class AsignacionController {
 

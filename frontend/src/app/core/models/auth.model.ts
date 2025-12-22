@@ -1,4 +1,4 @@
-import { User } from './user.model';
+import { Role } from './role.model';
 
 export interface LoginRequest {
   email: string;
@@ -6,6 +6,13 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  user: User;
+  id: number;
+  fullName: string;
+  email: string;
+  enabled: boolean;
+  createdAt: string;
+  roles: Role[];
+  token: string;
+  tokenType: string;
   message: string;
 }

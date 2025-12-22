@@ -23,7 +23,7 @@ describe('Register', () => {
   };
 
   beforeEach(async () => {
-    const userSpy = jasmine.createSpyObj('UserService', ['create']);
+    const userSpy = jasmine.createSpyObj('UserService', ['register']);
 
     await TestBed.configureTestingModule({
       imports: [Register, ReactiveFormsModule],
@@ -283,7 +283,7 @@ describe('Register', () => {
 
       component.onSubmit();
 
-      expect(userServiceSpy.create).not.toHaveBeenCalled();
+      expect(userServiceSpy.register).not.toHaveBeenCalled();
     });
 
     it('should mark all fields as touched when form is invalid', () => {
@@ -313,14 +313,14 @@ describe('Register', () => {
         terms: true
       });
 
-      userServiceSpy.create.and.returnValue(of(mockCreatedUser));
+      userServiceSpy.register.and.returnValue(of(mockCreatedUser));
 
       component.onSubmit();
 
-      expect(userServiceSpy.create).toHaveBeenCalledWith({
+      expect(userServiceSpy.register).toHaveBeenCalledWith({
         fullName: 'Test User',
         email: 'test@example.com',
-        passwordHash: 'Password123!',
+        password: 'Password123!',
         enabled: true
       });
 
@@ -350,7 +350,7 @@ describe('Register', () => {
         }
       };
 
-      userServiceSpy.create.and.returnValue(throwError(() => errorResponse));
+      userServiceSpy.register.and.returnValue(throwError(() => errorResponse));
 
       component.onSubmit();
 
@@ -372,7 +372,7 @@ describe('Register', () => {
         terms: true
       });
 
-      userServiceSpy.create.and.returnValue(throwError(() => ({})));
+      userServiceSpy.register.and.returnValue(throwError(() => ({})));
 
       component.onSubmit();
 
@@ -394,7 +394,7 @@ describe('Register', () => {
         terms: true
       });
 
-      userServiceSpy.create.and.returnValue(of(mockCreatedUser));
+      userServiceSpy.register.and.returnValue(of(mockCreatedUser));
 
       component.onSubmit();
       tick();
@@ -416,7 +416,7 @@ describe('Register', () => {
       });
 
       // Mock successful API call
-      userServiceSpy.create.and.returnValue(of(mockCreatedUser));
+      userServiceSpy.register.and.returnValue(of(mockCreatedUser));
 
       // Submit form
       component.onSubmit();

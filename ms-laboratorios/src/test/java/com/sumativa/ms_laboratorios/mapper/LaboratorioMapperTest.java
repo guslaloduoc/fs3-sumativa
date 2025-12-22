@@ -93,4 +93,112 @@ class LaboratorioMapperTest {
         // Assert
         assertEquals("Original", laboratorio.getNombre()); // Should not change
     }
+
+    @Test
+    void toEntity_shouldReturnNull_whenCreateDtoIsNull() {
+        // Act
+        Laboratorio laboratorio = LaboratorioMapper.toEntity(null);
+
+        // Assert
+        assertNull(laboratorio);
+    }
+
+    @Test
+    void updateEntityFromDto_shouldUpdateAllFields() {
+        // Arrange
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setNombre("Original");
+        laboratorio.setDireccion("Dirección Original");
+        laboratorio.setTelefono("111111111");
+
+        LaboratorioUpdateDto updateDto = new LaboratorioUpdateDto();
+        updateDto.setNombre("Updated");
+        updateDto.setDireccion("Nueva Dirección");
+        updateDto.setTelefono("999999999");
+
+        // Act
+        LaboratorioMapper.updateEntityFromDto(laboratorio, updateDto);
+
+        // Assert
+        assertEquals("Updated", laboratorio.getNombre());
+        assertEquals("Nueva Dirección", laboratorio.getDireccion());
+        assertEquals("999999999", laboratorio.getTelefono());
+    }
+
+    @Test
+    void updateEntityFromDto_shouldUpdateOnlyDireccion() {
+        // Arrange
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setNombre("Original");
+        laboratorio.setDireccion("Dirección Original");
+        laboratorio.setTelefono("111111111");
+
+        LaboratorioUpdateDto updateDto = new LaboratorioUpdateDto();
+        updateDto.setDireccion("Nueva Dirección");
+
+        // Act
+        LaboratorioMapper.updateEntityFromDto(laboratorio, updateDto);
+
+        // Assert
+        assertEquals("Original", laboratorio.getNombre());
+        assertEquals("Nueva Dirección", laboratorio.getDireccion());
+        assertEquals("111111111", laboratorio.getTelefono());
+    }
+
+    @Test
+    void updateEntityFromDto_shouldUpdateOnlyTelefono() {
+        // Arrange
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setNombre("Original");
+        laboratorio.setDireccion("Dirección Original");
+        laboratorio.setTelefono("111111111");
+
+        LaboratorioUpdateDto updateDto = new LaboratorioUpdateDto();
+        updateDto.setTelefono("999999999");
+
+        // Act
+        LaboratorioMapper.updateEntityFromDto(laboratorio, updateDto);
+
+        // Assert
+        assertEquals("Original", laboratorio.getNombre());
+        assertEquals("Dirección Original", laboratorio.getDireccion());
+        assertEquals("999999999", laboratorio.getTelefono());
+    }
+
+    @Test
+    void toEntity_shouldHandleNullFields() {
+        // Arrange
+        LaboratorioCreateDto createDto = new LaboratorioCreateDto();
+        createDto.setNombre("Lab Test");
+        // direccion and telefono are null
+
+        // Act
+        Laboratorio laboratorio = LaboratorioMapper.toEntity(createDto);
+
+        // Assert
+        assertNotNull(laboratorio);
+        assertEquals("Lab Test", laboratorio.getNombre());
+        assertNull(laboratorio.getDireccion());
+        assertNull(laboratorio.getTelefono());
+    }
+
+    @Test
+    void toResponseDto_shouldHandleNullOptionalFields() {
+        // Arrange
+        Laboratorio laboratorio = new Laboratorio();
+        laboratorio.setId(1L);
+        laboratorio.setNombre("Lab Test");
+        laboratorio.setDireccion(null);
+        laboratorio.setTelefono(null);
+
+        // Act
+        LaboratorioResponseDto dto = LaboratorioMapper.toResponseDto(laboratorio);
+
+        // Assert
+        assertNotNull(dto);
+        assertEquals(1L, dto.getId());
+        assertEquals("Lab Test", dto.getNombre());
+        assertNull(dto.getDireccion());
+        assertNull(dto.getTelefono());
+    }
 }

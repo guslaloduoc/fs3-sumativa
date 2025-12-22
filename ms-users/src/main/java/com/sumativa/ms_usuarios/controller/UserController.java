@@ -167,7 +167,7 @@ public class UserController {
 
     /**
      * POST /api/users/login
-     * Inicio de sesión - Valida credenciales y retorna información del usuario
+     * Inicio de sesión - Valida credenciales y retorna información del usuario con JWT token
      *
      * Body ejemplo:
      * {
@@ -177,10 +177,29 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword())
-            .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas o usuario deshabilitado"));
-
-        LoginResponse response = UserMapper.toLoginResponse(user);
+        LoginResponse response = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * POST /api/users/register
+     * Registro público de nuevos usuarios (no requiere autenticación)
+     * Asigna rol USER por defecto
+     *
+     * Body ejemplo:
+     * {
+     *   "fullName": "Juan Pérez",
+     *   "email": "juan@duocuc.cl",
+     *   "password": "password123"
+     * }
+     * @return UserResponseDto del usuario registrado
+     */
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserCreateDto createDto) {
+        log.info("POST /api/users/register - Public registration for email: {}", createDto.getEmail());
+        User user = UserMapper.toEntity(createDto);
+        User registeredUser = userService.registerUser(user);
+        UserResponseDto responseDto = UserMapper.toResponseDto(registeredUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

@@ -1,9 +1,12 @@
 package com.sumativa.ms_usuarios.service;
 
+import com.sumativa.ms_usuarios.dto.LoginResponse;
+import com.sumativa.ms_usuarios.dto.RoleResponseDto;
 import com.sumativa.ms_usuarios.entity.Role;
 import com.sumativa.ms_usuarios.entity.User;
 import com.sumativa.ms_usuarios.repository.RoleRepository;
 import com.sumativa.ms_usuarios.repository.UserRepository;
+import com.sumativa.ms_usuarios.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para gestión de usuarios
@@ -24,6 +28,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * Obtiene todos los usuarios
@@ -221,25 +226,78 @@ public class UserService {
     }
 
     /**
-     * Inicio de sesión básico (sin cifrado, según pauta)
-     * Valida email y password en texto plano
+     * Inicio de sesión con generación de JWT
+     * Valida email y password en texto plano (según pauta) y genera token JWT
      */
-    public Optional<User> login(String email, String password) {
+    public LoginResponse login(String email, String password) {
         log.info("Login attempt for email: {}", email);
 
-        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
+        User user = userRepository.findByEmailIgnoreCase(email)
+            .orElseThrow(() -> {
+                log.warn("Login failed for email: {} (user not found)", email);
+                return new IllegalArgumentException("Credenciales inválidas o usuario deshabilitado");
+            });
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            // Validar password en texto plano (NO loggear contraseña)
-            if (user.getPasswordHash().equals(password) && user.getEnabled()) {
-                log.info("Login successful for user: {}", email);
-                return Optional.of(user);
-            }
+        // Validar password en texto plano (NO loggear contraseña)
+        if (!user.getPasswordHash().equals(password)) {
+            log.warn("Login failed for email: {} (invalid password)", email);
+            throw new IllegalArgumentException("Credenciales inválidas o usuario deshabilitado");
         }
 
-        log.warn("Login failed for email: {} (invalid credentials or disabled user)", email);
-        return Optional.empty();
+        if (!user.getEnabled()) {
+            log.warn("Login failed for email: {} (user disabled)", email);
+            throw new IllegalArgumentException("Credenciales inválidas o usuario deshabilitado");
+        }
+
+        log.info("Login successful for user: {}", email);
+
+        // Generar token JWT
+        List<String> roleNames = user.getRoles().stream()
+            .map(Role::getName)
+            .collect(Collectors.toList());
+        String token = jwtTokenProvider.generateToken(email, roleNames);
+
+        // Convertir roles a DTOs
+        Set<RoleResponseDto> rolesDto = user.getRoles().stream()
+            .map(role -> new RoleResponseDto(role.getName()))
+            .collect(Collectors.toSet());
+
+        // Crear y retornar LoginResponse con token
+        return new LoginResponse(
+            user.getId(),
+            user.getFullName(),
+            user.getEmail(),
+            user.getEnabled(),
+            user.getCreatedAt(),
+            rolesDto,
+            token
+        );
+    }
+
+    /**
+     * Registro público de usuarios
+     * Crea un nuevo usuario con rol USER por defecto
+     */
+    @Transactional
+    public User registerUser(User user) {
+        log.info("Registering new user with email: {}", user.getEmail());
+
+        // Crear el usuario usando el método existente
+        User createdUser = createUser(user);
+
+        // Asignar rol USER por defecto
+        Role userRole = roleRepository.findByName("USER")
+            .orElseGet(() -> {
+                log.warn("Role USER not found, trying LAB_TECH");
+                return roleRepository.findByName("LAB_TECH")
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró un rol por defecto"));
+            });
+
+        createdUser.getRoles().add(userRole);
+        User savedUser = userRepository.save(createdUser);
+
+        log.info("User registered successfully with id: {} and default role", savedUser.getId());
+        return savedUser;
     }
 
     /**

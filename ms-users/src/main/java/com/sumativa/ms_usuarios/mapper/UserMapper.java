@@ -91,27 +91,4 @@ public class UserMapper {
             user.setEnabled(updateDto.getEnabled());
         }
     }
-
-    /**
-     * Convierte una entidad User a LoginResponse
-     * Utilizado específicamente en el endpoint de login
-     */
-    public static LoginResponse toLoginResponse(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        Set<RoleResponseDto> roleDtos = user.getRoles().stream()
-            .map(UserMapper::toRoleResponseDto)
-            .collect(Collectors.toSet());
-
-        return new LoginResponse(
-            user.getId(),
-            user.getFullName(),
-            user.getEmail(),
-            user.getEnabled(),
-            user.getCreatedAt(),
-            roleDtos
-        );
-    }
 }

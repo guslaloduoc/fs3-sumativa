@@ -7,7 +7,7 @@ import { Laboratory, CreateLaboratoryRequest, UpdateLaboratoryRequest } from '..
 describe('LaboratoryService', () => {
   let service: LaboratoryService;
   let httpMock: HttpTestingController;
-  const API_URL = 'http://localhost:8082/api/laboratorios';
+  const API_URL = 'http://localhost:8080/api/laboratorios';
 
   const mockLaboratory: Laboratory = {
     id: 1,
@@ -367,7 +367,7 @@ describe('LaboratoryService', () => {
 
   describe('API_URL configuration', () => {
     it('should use correct API endpoint', () => {
-      expect(service['API_URL']).toBe('http://localhost:8082/api/laboratorios');
+      expect(service['API_URL']).toBe('http://localhost:8080/api/laboratorios');
     });
   });
 });

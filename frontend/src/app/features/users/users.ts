@@ -142,7 +142,7 @@ export class Users implements OnInit {
 
       // Solo incluir password si se proporcionó uno nuevo
       if (password) {
-        updateData.passwordHash = password;
+        updateData.password = password;
       }
 
       this.userService.update(this.selectedUserId, updateData).subscribe({
@@ -162,7 +162,7 @@ export class Users implements OnInit {
       const createData: CreateUserRequest = {
         fullName: this.userForm.get('fullName')?.value,
         email: this.userForm.get('email')?.value,
-        passwordHash: password,
+        password: password,
         enabled: this.userForm.get('enabled')?.value
       };
 
